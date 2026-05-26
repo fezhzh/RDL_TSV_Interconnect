@@ -1,6 +1,7 @@
 import importlib.util
 import os
 import re
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -8,8 +9,9 @@ from scipy.optimize import least_squares
 
 
 BASE_DIR = os.path.dirname(__file__)
-SNP_DIR = os.path.join(BASE_DIR, "RDL_Bottom_Snp")
-OUTPUT_CSV = os.path.join(BASE_DIR, "RDL_Bottom_TD_dp_trend.csv")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SNP_DIR = os.path.join(PROJECT_ROOT, "data", "sparameters", "RDL_Bottom_Snp")
+OUTPUT_CSV = os.path.join(PROJECT_ROOT, "data", "tables", "RDL_Bottom_TD_dp_trend.csv")
 SOURCE_SCRIPT = os.path.join(BASE_DIR, "提参2.py")
 
 N_DUT = 300

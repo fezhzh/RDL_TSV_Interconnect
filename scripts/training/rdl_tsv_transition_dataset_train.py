@@ -16,7 +16,7 @@ RDL/TSV 级联 + 过渡结构建模 + 共享过渡结构神经网络训练入口
     persistence.py    关键中间结果保存
     dataset.py        多 DUT 数据集训练主流程
 
-运行后默认在 ./RDL_TSV_results/intermediate 下保存：
+运行后默认在 ./outputs/training/RDL_TSV_results/intermediate 下保存：
     dutXXX/metadata.json
     dutXXX/sample_arrays.npz
     dutXXX/evaluation_arrays.npz
@@ -27,6 +27,14 @@ RDL/TSV 级联 + 过渡结构建模 + 共享过渡结构神经网络训练入口
     models/transition_model_supervised.pth
     models/transition_model_fine_tuned.pth
 """
+
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SRC_DIR = PROJECT_ROOT / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
 from rdl_tsv_transition import run_batch, run_dataset_training, run_one_dut
 from rdl_tsv_transition.circuit import block_to_abcd, block_to_network, circuit_params_to_rlgc, rlgc_to_abcd
@@ -117,8 +125,8 @@ if __name__ == "__main__":
     run_dataset_training(
         start_idx=1,
         end_idx=10,
-        s2p_dir="./RDL_TSV_Snp",
-        mat_dir="./RDL_TSV_mat2",
+        s2p_dir="./data/sparameters/RDL_TSV_Snp",
+        mat_dir="./data/matlab_models/RDL_TSV_mat2",
         max_points=None,
         supervised_epochs=2000,
         fine_epochs=1000,
@@ -130,7 +138,7 @@ if __name__ == "__main__":
         fine_sample_batch_size=2,
         plot=True,
         save_plot=False,
-        out_dir="./RDL_TSV_results",
+        out_dir="./outputs/training/RDL_TSV_results",
         save_intermediate=True,
         verbose=True,
     )

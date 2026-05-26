@@ -271,7 +271,7 @@ def build_models(args, base_dir):
 
 
 def compare_models(args):
-    base_dir = Path(args.base_dir).resolve() if args.base_dir else Path(__file__).resolve().parent
+    base_dir = Path(args.base_dir).resolve() if args.base_dir else Path(__file__).resolve().parents[2]
     hfss_dir = (base_dir / args.hfss_dir).resolve()
     out_dir = (base_dir / args.out_dir).resolve()
     plots_dir = out_dir / "plots"
@@ -391,12 +391,12 @@ def compare_models(args):
 def build_arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-dir", default=None)
-    parser.add_argument("--hfss-dir", default="RDL_Bottom_Snp")
-    parser.add_argument("--case-csv", default="RDL_Bottom_TD_4.csv", help="限制对比到该 CSV 中的几何样本；留空则对比全部 s2p")
-    parser.add_argument("--out-dir", default="RDL_Bottom_model_compare_new")
+    parser.add_argument("--hfss-dir", default="data/sparameters/RDL_Bottom_Snp")
+    parser.add_argument("--case-csv", default="data/tables/RDL_Bottom_TD_4.csv", help="限制对比到该 CSV 中的几何样本；留空则对比全部 s2p")
+    parser.add_argument("--out-dir", default="outputs/comparison/RDL_Bottom_model_compare_new")
     parser.add_argument("--length-param", choices=["htsv", "ldown"], default="ldown")
-    parser.add_argument("--mat-model", action="append", default=["mat1=RDL_TSV_mat1", "mat2=RDL_TSV_mat2"])
-    parser.add_argument("--new-model-dir", default="RDL_Bottom_TD4_trend_sparam_training")
+    parser.add_argument("--mat-model", action="append", default=["mat1=data/matlab_models/RDL_TSV_mat1", "mat2=data/matlab_models/RDL_TSV_mat2"])
+    parser.add_argument("--new-model-dir", default="outputs/training/RDL_Bottom_TD4_trend_sparam_training")
     parser.add_argument("--new-label", default="new_s_finetuned")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--no-plots", action="store_true")

@@ -312,8 +312,8 @@ def fine_tune_transition_nn_on_dataset(
 def run_dataset_training(
     start_idx: int = 1,
     end_idx: int = 10,
-    s2p_dir: str = "./RDL_TSV_Snp",
-    mat_dir: str = "./RDL_TSV_mat2",
+    s2p_dir: str = "./data/sparameters/RDL_TSV_Snp",
+    mat_dir: str = "./data/matlab_models/RDL_TSV_mat2",
     max_points: Optional[int] = None,
     supervised_epochs: int = 1000,
     fine_epochs: int = 300,
@@ -325,7 +325,7 @@ def run_dataset_training(
     fine_sample_batch_size: int = 2,
     plot: bool = True,
     save_plot: bool = False,
-    out_dir: str = "./RDL_TSV_results",
+    out_dir: str = "./outputs/training/RDL_TSV_results",
     save_intermediate: bool = True,
     verbose: bool = True,
 ) -> Dict[str, object]:

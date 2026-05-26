@@ -14,7 +14,7 @@ from .constants import Z_REF
 def script_base_dir() -> str:
     """兼容 .py 脚本和 notebook/交互环境。"""
     if "__file__" in globals():
-        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     return os.getcwd()
 
 

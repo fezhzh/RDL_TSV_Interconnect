@@ -12,9 +12,8 @@ archive/
 *.pt
 
 # Generated experiment outputs
-RDL_TSV_results*/
-RDL_Bottom_*training*/
-RDL_Bottom_model_compare/
+outputs/
+models/
 *.png
 
 # Editor/OS noise

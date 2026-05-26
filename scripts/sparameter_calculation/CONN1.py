@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import glob
 import numpy as np
 import skrf as rf
@@ -335,10 +336,10 @@ def evaluate_and_plot(model_path, X_data, Y_data, num_plots=2):
 # 4. 主程序
 # ==========================================
 if __name__ == "__main__":
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    os.chdir(Path(__file__).resolve().parents[2])
     
-    dir_input_X  = r"./RDL_TSV_NN_Snp"    
-    dir_target_Y = r"./RDL_TSV_Snp"        
+    dir_input_X  = r"./data/sparameters/RDL_TSV_NN_Snp"    
+    dir_target_Y = r"./data/sparameters/RDL_TSV_Snp"        
 
     if not os.path.exists(dir_input_X) or not os.path.exists(dir_target_Y):
         print("错误：数据文件夹不存在，请检查路径。")

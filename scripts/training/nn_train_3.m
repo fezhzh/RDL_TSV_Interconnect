@@ -4,7 +4,7 @@ close all
 clear all
 
 
-data1 = xlsread("./RDL_Bottom_TD_4.csv");
+data1 = xlsread("./data/tables/RDL_Bottom_TD_4.csv");
 data = data1;%+data2;
 % fit_list = [6:14];%
 fit_list = [6:14];%
@@ -52,7 +52,7 @@ if ~isempty(data)
         end
         MaxErrorLists=[MaxErrorLists;[j,MaxErrorList]];
         AverageErrorLists=[AverageErrorLists;[j,AverageErrorList]];
-        NN_export(net_p,input,output_v,strcat('./RDL_TSV_mat4/RDL_Bottom_',name_list(j),'.mat'),name_list(j))
+        NN_export(net_p,input,output_v,strcat('./data/matlab_models/RDL_TSV_mat4/RDL_Bottom_',name_list(j),'.mat'),name_list(j))
         clearvars net*
     end
 

@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import re
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,6 +19,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 
 BASE_DIR = os.path.dirname(__file__)
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PARAM_NAMES = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
 GEOM_NAMES = ["l_rdl", "w_rdl", "t_rdl", "h_tsv", "p_rdl"]
 Z_REF = 50.0
@@ -265,9 +267,9 @@ def predict_params(model, x_norm, stats, device):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--csv", default=os.path.join(BASE_DIR, "RDL_Bottom_TD_2.csv"))
-    parser.add_argument("--snp-dir", default=os.path.join(BASE_DIR, "RDL_Bottom_Snp"))
-    parser.add_argument("--out-dir", default=os.path.join(BASE_DIR, "RDL_Bottom_trend_sparam_training"))
+    parser.add_argument("--csv", default=os.path.join(PROJECT_ROOT, "data", "tables", "RDL_Bottom_TD_2.csv"))
+    parser.add_argument("--snp-dir", default=os.path.join(PROJECT_ROOT, "data", "sparameters", "RDL_Bottom_Snp"))
+    parser.add_argument("--out-dir", default=os.path.join(PROJECT_ROOT, "outputs", "training", "RDL_Bottom_trend_sparam_training"))
     parser.add_argument("--score-threshold", type=float, default=3.5)
     parser.add_argument("--supervised-epochs", type=int, default=2000)
     parser.add_argument("--fine-epochs", type=int, default=800)

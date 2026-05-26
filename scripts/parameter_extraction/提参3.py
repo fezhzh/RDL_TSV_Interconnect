@@ -7,6 +7,7 @@ from scipy.optimize import least_squares
 from scipy.signal import medfilt
 import re
 import os
+from pathlib import Path
 import pandas as pd
 from skrf import Frequency, Network
 
@@ -358,7 +359,7 @@ def find_resonation_frequency(Y11):
 #######主函数部分##########################
 if __name__ == '__main__':
 
-    os.chdir(os.path.dirname(__file__))  # 切换到脚本所在目录（可选）
+    os.chdir(Path(__file__).resolve().parents[2])  # 切换到脚本所在目录（可选）
     # output_csv_path = r"D:\MLIN\SNP\output_variables_real_0628.csv"
         #输入1-150Ghz长度为L的EM数据，长度为100um的EM数据,L的长度
     # 初始化 CSV 数据存储列表
@@ -366,7 +367,7 @@ if __name__ == '__main__':
 
     # 处理多个文件 dut0.s4p 到 dut3000.s4p
     for i in range(0, 300, 1):  
-        momentum_path = fr"./RDL_Bottom_Snp/dut{i}.s2p"  # 请确保路径与您实际存放的路径一致
+        momentum_path = fr"./data/sparameters/RDL_Bottom_Snp/dut{i}.s2p"  # 请确保路径与您实际存放的路径一致
         
         if not os.path.exists(momentum_path):  
             print(f"文件 {momentum_path} 不存在，跳过")
@@ -444,7 +445,7 @@ if __name__ == '__main__':
         
 
         # 导出提取得到的参数
-        output_csv_path = r"./RDL_Bottom_TD_4.csv" 
+        output_csv_path = r"./data/tables/RDL_Bottom_TD_4.csv" 
         csv_row = [l_rdl, w_rdl, t_rdl, h_tsv, p_rdl]+list(parameter_spice)+[rmse]
         csv_data.append(csv_row)
         csv_headers = ["l_rdl", "w_rdl", "t_rdl", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]

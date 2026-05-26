@@ -295,7 +295,7 @@ def save_summary_plots(out_dir, summary_df, model_names):
 
 def compare_models(args):
     if args.base_dir is None:
-        base_dir = Path(__file__).resolve().parent
+        base_dir = Path(__file__).resolve().parents[2]
     else:
         base_dir = Path(args.base_dir).resolve()
     hfss_dir = (base_dir / args.hfss_dir).resolve()
@@ -306,9 +306,9 @@ def compare_models(args):
         plots_dir.mkdir(parents=True, exist_ok=True)
 
     model_specs = [
-        ("mat2", load_model_meta(base_dir / "RDL_TSV_mat2")),
-        ("mat3", load_model_meta(base_dir / "RDL_TSV_mat3")),
-        ("mat4", load_model_meta(base_dir / "RDL_TSV_mat4")),
+        ("mat2", load_model_meta(base_dir / "data" / "matlab_models" / "RDL_TSV_mat2")),
+        ("mat3", load_model_meta(base_dir / "data" / "matlab_models" / "RDL_TSV_mat3")),
+        ("mat4", load_model_meta(base_dir / "data" / "matlab_models" / "RDL_TSV_mat4")),
     ]
 
     s2p_files = sorted(hfss_dir.glob("*.s2p"), key=natural_key)
@@ -449,11 +449,11 @@ def build_arg_parser():
     parser = argparse.ArgumentParser(
         description="Compare RDL_Bottom predictions from RDL_TSV_mat2, RDL_TSV_mat3, and RDL_TSV_mat4 against HFSS s2p files."
     )
-    parser.add_argument("--base-dir", default=None, help="工程目录，默认脚本所在目录")
-    parser.add_argument("--hfss-dir", default="RDL_Bottom_Snp", help="HFSS RDL_Bottom s2p 文件夹")
+    parser.add_argument("--base-dir", default=None, help="工程根目录，默认自动定位到项目根目录")
+    parser.add_argument("--hfss-dir", default="data/sparameters/RDL_Bottom_Snp", help="HFSS RDL_Bottom s2p 文件夹")
     parser.add_argument(
         "--out-dir",
-        default="RDL_Bottom_model_compare",
+        default="outputs/comparison/RDL_Bottom_model_compare",
         help="输出目录，包含 CSV 和 PNG",
     )
     parser.add_argument(

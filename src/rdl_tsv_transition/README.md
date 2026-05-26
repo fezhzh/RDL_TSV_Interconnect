@@ -29,12 +29,12 @@ torch
 默认假设数据和 MATLAB 导出的网络参数位于入口脚本同级目录：
 
 ```text
-RDL_TSV_Snp/
+data/sparameters/RDL_TSV_Snp/
   dut1.s2p
   dut2.s2p
   ...
 
-RDL_TSV_mat2/
+data/matlab_models/RDL_TSV_mat2/
   RDL_Top_R1.mat
   RDL_Top_R2.mat
   ...
@@ -213,7 +213,7 @@ PyTorch 版本的过渡结构级联，用于端到端微调：
 默认保存目录：
 
 ```text
-RDL_TSV_results/
+outputs/training/RDL_TSV_results/
   intermediate/
     dut001/
       metadata.json
@@ -331,8 +331,8 @@ NN fine-tuned transition
 分析结果保存到：
 
 ```text
-RDL_TSV_results/intermediate/dataset/error_analysis.json
-RDL_TSV_results/intermediate/dataset/error_analysis.md
+outputs/training/RDL_TSV_results/intermediate/dataset/error_analysis.json
+outputs/training/RDL_TSV_results/intermediate/dataset/error_analysis.md
 ```
 
 如果开启 `plot=True` 或 `save_plot=True`，会绘制：
@@ -358,8 +358,8 @@ python rdl_tsv_transition_dataset_train.py
 run_dataset_training(
     start_idx=1,
     end_idx=10,
-    s2p_dir="./RDL_TSV_Snp",
-    mat_dir="./RDL_TSV_mat2",
+    s2p_dir="./data/sparameters/RDL_TSV_Snp",
+    mat_dir="./data/matlab_models/RDL_TSV_mat2",
     max_points=None,
     supervised_epochs=2000,
     fine_epochs=1000,
@@ -371,7 +371,7 @@ run_dataset_training(
     fine_sample_batch_size=2,
     plot=True,
     save_plot=False,
-    out_dir="./RDL_TSV_results",
+    out_dir="./outputs/training/RDL_TSV_results",
     save_intermediate=True,
     verbose=True,
 )
@@ -385,14 +385,14 @@ from rdl_tsv_transition import run_dataset_training
 output = run_dataset_training(
     start_idx=1,
     end_idx=10,
-    s2p_dir="./RDL_TSV_Snp",
-    mat_dir="./RDL_TSV_mat2",
+    s2p_dir="./data/sparameters/RDL_TSV_Snp",
+    mat_dir="./data/matlab_models/RDL_TSV_mat2",
     max_points=300,
     supervised_epochs=500,
     fine_epochs=200,
     plot=False,
     save_plot=True,
-    out_dir="./RDL_TSV_results",
+    out_dir="./outputs/training/RDL_TSV_results",
     save_intermediate=True,
 )
 ```
@@ -420,8 +420,8 @@ from rdl_tsv_transition import run_one_dut
 
 result = run_one_dut(
     idx=1,
-    s2p_dir="./RDL_TSV_Snp",
-    mat_dir="./RDL_TSV_mat2",
+    s2p_dir="./data/sparameters/RDL_TSV_Snp",
+    mat_dir="./data/matlab_models/RDL_TSV_mat2",
     max_points=300,
     supervised_epochs=200,
     fine_epochs=100,
@@ -467,7 +467,7 @@ output = run_dataset_training(
 ```python
 import numpy as np
 
-data = np.load("./RDL_TSV_results/intermediate/dataset/transition_training_dataset.npz")
+data = np.load("./outputs/training/RDL_TSV_results/intermediate/dataset/transition_training_dataset.npz")
 X_all = data["X_all"]
 Y_all = data["Y_all"]
 ```
@@ -475,7 +475,7 @@ Y_all = data["Y_all"]
 读取某个 DUT 的样本数组：
 
 ```python
-sample = np.load("./RDL_TSV_results/intermediate/dut001/sample_arrays.npz")
+sample = np.load("./outputs/training/RDL_TSV_results/intermediate/dut001/sample_arrays.npz")
 freqs_hz = sample["freqs_hz"]
 hfss_s = sample["hfss_s"]
 direct_full_s = sample["direct_full_s"]
@@ -490,7 +490,7 @@ Y_raw = sample["Y_raw"]
 import torch
 from rdl_tsv_transition.model import TransitionElementNN, Normalizer
 
-ckpt = torch.load("./RDL_TSV_results/intermediate/models/transition_model_fine_tuned.pth")
+ckpt = torch.load("./outputs/training/RDL_TSV_results/intermediate/models/transition_model_fine_tuned.pth")
 
 model = TransitionElementNN(hidden=ckpt["extra"]["hidden"]).to(dtype=torch.float64)
 model.load_state_dict(ckpt["model_state_dict"])
@@ -510,8 +510,8 @@ normalizer = Normalizer(
 ```python
 import pandas as pd
 
-pretrain_loss = pd.read_csv("./RDL_TSV_results/intermediate/loss_curves/supervised_pretrain_loss.csv")
-fine_loss = pd.read_csv("./RDL_TSV_results/intermediate/loss_curves/hfss_fine_tune_loss.csv")
+pretrain_loss = pd.read_csv("./outputs/training/RDL_TSV_results/intermediate/loss_curves/supervised_pretrain_loss.csv")
+fine_loss = pd.read_csv("./outputs/training/RDL_TSV_results/intermediate/loss_curves/hfss_fine_tune_loss.csv")
 ```
 
 读取误差分析：
@@ -519,7 +519,7 @@ fine_loss = pd.read_csv("./RDL_TSV_results/intermediate/loss_curves/hfss_fine_tu
 ```python
 import json
 
-with open("./RDL_TSV_results/intermediate/dataset/error_analysis.json", "r", encoding="utf-8") as f:
+with open("./outputs/training/RDL_TSV_results/intermediate/dataset/error_analysis.json", "r", encoding="utf-8") as f:
     analysis = json.load(f)
 
 print(analysis["best_model_by_mean_mse"])

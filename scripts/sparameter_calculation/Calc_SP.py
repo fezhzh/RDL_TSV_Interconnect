@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import re
 import numpy as np
 import scipy.io as sio
@@ -259,9 +260,9 @@ def Plot_S_Comparison(hfss_nw, nn_nw):
 # ==========================================
 
 def Calc_RDL_Top_S(idx):
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 切换到当前脚本目录，确保路径正确
-    s2p_file = rf"./RDL_Top_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
-    mat_dir  = r"./RDL_TSV_mat2"                            # .mat 模型存放的目录
+    os.chdir(Path(__file__).resolve().parents[2])  # 切换到当前脚本目录，确保路径正确
+    s2p_file = rf"./data/sparameters/RDL_Top_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
+    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                            # .mat 模型存放的目录
     model_prefix = "RDL_Top_"                # 神经网络导出的前缀
     
     if not os.path.exists(s2p_file):
@@ -301,9 +302,9 @@ def Calc_RDL_Top_S(idx):
     Plot_S_Comparison(RDL_Top_HFSS_NW, RDL_Top_NN_NW)
 
 def Calc_RDL_Bottom_S(idx):
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 切换到当前脚本目录，确保路径正确
-    s2p_file = rf"./RDL_Bottom_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
-    mat_dir  = r"./RDL_TSV_mat2"                            # .mat 模型存放的目录
+    os.chdir(Path(__file__).resolve().parents[2])  # 切换到当前脚本目录，确保路径正确
+    s2p_file = rf"./data/sparameters/RDL_Bottom_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
+    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                            # .mat 模型存放的目录
     model_prefix = "RDL_Bottom_"                # 神经网络导出的前缀
     
     if not os.path.exists(s2p_file):
@@ -343,9 +344,9 @@ def Calc_RDL_Bottom_S(idx):
     Plot_S_Comparison(RDL_Bottom_HFSS_NW, RDL_Bottom_NN_NW)
 
 def Calc_TSV_S(idx):
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))  # 切换到当前脚本目录，确保路径正确
-    s2p_file = rf"./TSV_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
-    mat_dir  = r"./RDL_TSV_mat2"                            # .mat 模型存放的目录
+    os.chdir(Path(__file__).resolve().parents[2])  # 切换到当前脚本目录，确保路径正确
+    s2p_file = rf"./data/sparameters/TSV_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
+    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                            # .mat 模型存放的目录
     model_prefix = "TSV_"                # 神经网络导出的前缀
     
     if not os.path.exists(s2p_file):
@@ -388,11 +389,11 @@ def Calc_TSV_S(idx):
 # 5. 【新增】级联计算核心函数 
 # ==========================================
 def Calc_Cascaded_RDL_TSV_S(idx):
-    os.chdir(os.path.dirname(os.path.abspath(__file__))) 
+    os.chdir(Path(__file__).resolve().parents[2]) 
     
     # 指向长链路全级联的 HFSS 测试文件
-    s2p_file = rf"./RDL_TSV_Snp/dut{idx}.s2p"         
-    mat_dir  = r"./RDL_TSV_mat2"                   
+    s2p_file = rf"./data/sparameters/RDL_TSV_Snp/dut{idx}.s2p"         
+    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                   
     
     if not os.path.exists(s2p_file):
         print(f"未找到测试文件: {s2p_file}")
@@ -447,12 +448,12 @@ def Calc_Cascaded_RDL_TSV_S(idx):
 
 
 def Batch_Calc_Cascaded_RDL_TSV_S():
-    os.chdir(os.path.dirname(os.path.abspath(__file__))) 
+    os.chdir(Path(__file__).resolve().parents[2]) 
     
     # 路径配置
-    input_dir  = r"./RDL_TSV_Snp"
-    output_dir = r"./RDL_TSV_NN_Snp"
-    mat_dir    = r"./RDL_TSV_mat2"
+    input_dir  = r"./data/sparameters/RDL_TSV_Snp"
+    output_dir = r"./data/sparameters/RDL_TSV_NN_Snp"
+    mat_dir    = r"./data/matlab_models/RDL_TSV_mat2"
     
     # 如果输出文件夹不存在，则自动创建
     if not os.path.exists(output_dir):
@@ -523,14 +524,14 @@ def Batch_Calc_Cascaded_RDL_TSV_S():
         print(f"    [成功] 已级联并保存至 -> {os.path.join(output_dir, filename)}\n")
         
 
-def Compare_Snp_Directories(dir_original="./RDL_TSV_Snp", dir_predicted="./RDL_TSV_NN_Snp", plot_worst_case=True):
+def Compare_Snp_Directories(dir_original="./data/sparameters/RDL_TSV_Snp", dir_predicted="./data/sparameters/RDL_TSV_NN_Snp", plot_worst_case=True):
     """
     对比两个文件夹下同名的 S 参数文件。
     :param dir_original: 原始 HFSS S参数文件夹路径
     :param dir_predicted: 神经网络预测 S参数文件夹路径
     :param plot_worst_case: 是否在对比结束后自动画出误差最大的一组数据进行人工确认
     """
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    os.chdir(Path(__file__).resolve().parents[2])
     
     if not os.path.exists(dir_original):
         print(f"错误: 找不到原始文件夹 {dir_original}")

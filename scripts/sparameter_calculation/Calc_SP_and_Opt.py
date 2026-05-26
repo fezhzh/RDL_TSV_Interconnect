@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import re
 import numpy as np
 import scipy.io as sio
@@ -255,10 +256,10 @@ def get_correction_abcd(p, omega):
 # 6. 级联计算与联合参数优化核心函数
 # ==========================================
 def Calc_Cascaded_RDL_TSV_S(idx):
-    os.chdir(os.path.dirname(os.path.abspath(__file__))) 
+    os.chdir(Path(__file__).resolve().parents[2]) 
     
-    s2p_file = rf"./RDL_TSV_Snp/dut{idx}.s2p"         
-    mat_dir  = r"./RDL_TSV_mat2"                   
+    s2p_file = rf"./data/sparameters/RDL_TSV_Snp/dut{idx}.s2p"         
+    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                   
     
     if not os.path.exists(s2p_file):
         print(f"未找到测试文件: {s2p_file}")
