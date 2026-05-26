@@ -1,0 +1,22 @@
+# Python cache and local runtime artifacts
+__pycache__/
+*.py[cod]
+
+# Local archives and obsolete/generated scratch files
+archive/
+*.asv
+*.tmp
+
+# Generated model/checkpoint files
+*.pth
+*.pt
+
+# Generated experiment outputs
+RDL_TSV_results*/
+RDL_Bottom_*training*/
+RDL_Bottom_model_compare/
+*.png
+
+# Editor/OS noise
+.DS_Store
+Thumbs.db
