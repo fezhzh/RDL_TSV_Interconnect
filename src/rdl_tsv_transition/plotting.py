@@ -256,6 +256,15 @@ def plot_RLGC(RLGCs, freqs, names):
     plt.tight_layout()
 
 
+def plot_extraction_comparison(RLGCs, sparameters, freqs, names, show: bool = True) -> None:
+    """Plot the standard extraction diagnostics used by parameter extraction scripts."""
+    plot_RLGC(RLGCs=RLGCs, freqs=freqs, names=names)
+    plot_2ports_S(Sparameters=sparameters, names=names, type="RI", freqs=freqs)
+    plot_2ports_S(Sparameters=sparameters, names=names, type="MP", freqs=freqs)
+    if show:
+        plt.show()
+
+
 def save_current_figure(save_path, dpi: int = 300) -> None:
     """Save current pyplot figure, creating the destination directory if needed."""
     os.makedirs(os.path.dirname(os.path.abspath(save_path)), exist_ok=True)

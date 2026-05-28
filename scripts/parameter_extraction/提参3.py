@@ -15,7 +15,7 @@ SRC_DIR = Path(__file__).resolve().parents[2] / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
-from rdl_tsv_transition.plotting import plot_2ports_Leq, plot_2ports_Req, plot_2ports_S, plot_RLGC
+from rdl_tsv_transition.plotting import plot_extraction_comparison
 
 
 def path_S2P(path):
@@ -296,21 +296,22 @@ if __name__ == '__main__':
  
 
 
-        # # 绘图
-        # plot_RLGC(RLGCs=RLGCs, freqs=freqs, names=["Simulated","Fitting"])
-        # plot_2ports_S(Sparameters=sps, names=["Simulated","Fitting"],type="RI",freqs=freqs)        
-        # plot_2ports_S(Sparameters=sps, names=["Simulated","Fitting"],type="MP",freqs=freqs)        
-        # # plot_2ports_Req(Yparameters=yps, names=["Simulated","Fitting"],freqs=freqs)
-        # plt.show()
+        # 绘图
+        plot_extraction_comparison(
+            RLGCs=RLGCs,
+            sparameters=sps,
+            freqs=freqs,
+            names=["Simulated", "Fitting"],
+        )
         
 
         # 导出提取得到的参数
-        output_csv_path = r"./data/tables/RDL_Bottom_TD_4.csv" 
-        csv_row = [l_rdl, w_rdl, t_rdl, h_tsv, p_rdl]+list(parameter_spice)+[rmse]
-        csv_data.append(csv_row)
-        csv_headers = ["l_rdl", "w_rdl", "t_rdl", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
-        # csv_headers = ["d_tsv", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
-        df = pd.DataFrame(csv_data, columns=csv_headers)
-        df.to_csv(output_csv_path, index=False)
-        print(f"dut{i}参数保存到：{output_csv_path}")
+        # output_csv_path = r"./data/tables/RDL_Bottom_TD_4.csv" 
+        # csv_row = [l_rdl, w_rdl, t_rdl, h_tsv, p_rdl]+list(parameter_spice)+[rmse]
+        # csv_data.append(csv_row)
+        # csv_headers = ["l_rdl", "w_rdl", "t_rdl", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
+        # # csv_headers = ["d_tsv", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
+        # df = pd.DataFrame(csv_data, columns=csv_headers)
+        # df.to_csv(output_csv_path, index=False)
+        # print(f"dut{i}参数保存到：{output_csv_path}")
 

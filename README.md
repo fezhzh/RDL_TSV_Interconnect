@@ -7,7 +7,7 @@
 | 路径 | 作用 |
 | --- | --- |
 | `src/rdl_tsv_transition/` | 模块化后的 RDL/TSV 级联、过渡结构建模、共享过渡结构 NN 训练和 HFSS 端到端微调工具包。 |
-| `src/rdl_tsv_transition/plotting.py` | 脚本复用的本地绘图模块，集中提供 S 参数模型对比图、参数提取曲线和通用绘图样式函数。 |
+| `src/rdl_tsv_transition/plotting.py` | 脚本复用的本地绘图模块，集中提供 S 参数模型对比图、参数提取标准诊断图和通用绘图样式函数。 |
 | `scripts/parameter_extraction/` | 参数提取脚本，包括 `提参2.py`、`提参3.py` 和 trend 参数提取脚本。 |
 | `scripts/sparameter_calculation/` | 早期 S 参数计算、级联、优化和 NN 比较脚本。 |
 | `scripts/training/` | 训练入口脚本，包括 RDL Bottom trend+sparam 训练和 RDL/TSV 过渡模型训练。 |
