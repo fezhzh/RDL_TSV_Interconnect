@@ -1,6 +1,7 @@
 import argparse
 import faulthandler
 import re
+import sys
 from pathlib import Path
 
 faulthandler.enable()
@@ -12,7 +13,16 @@ import skrf as rf
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+
+SRC_DIR = Path(__file__).resolve().parents[2] / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from rdl_tsv_transition.plotting import (
+    db20,
+    save_model_case_plot as save_case_plot,
+    save_model_summary_plots as save_summary_plots,
+)
 
 
 TARGET_PARAMS = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
@@ -147,10 +157,6 @@ def calculate_s_parameters(circuit_params, length_um, freqs_hz):
     return s
 
 
-def db20(value):
-    return 20.0 * np.log10(np.maximum(np.abs(value), 1e-300))
-
-
 def safe_rel_error(pred, ref):
     return np.abs(pred - ref) / np.maximum(np.abs(ref), 1e-12)
 
@@ -174,123 +180,6 @@ def calc_metrics(pred_s, ref_s, label_prefix):
         )
 
     return metrics
-
-
-def configure_matplotlib():
-    plt.rcParams.update(
-        {
-            "figure.facecolor": "#f6f8fb",
-            "axes.facecolor": "white",
-            "axes.edgecolor": "#1f2937",
-            "axes.labelcolor": "#1f2937",
-            "axes.titlecolor": "#111827",
-            "xtick.color": "#475569",
-            "ytick.color": "#475569",
-            "grid.color": "#e2e8f0",
-            "grid.linewidth": 0.8,
-            "font.family": "DejaVu Sans",
-            "font.size": 10,
-            "legend.frameon": True,
-            "legend.facecolor": "white",
-            "legend.edgecolor": "#cbd5e1",
-            "savefig.facecolor": "#f6f8fb",
-            "savefig.bbox": "tight",
-        }
-    )
-
-
-def style_axis(ax, title, ylabel):
-    ax.set_title(title, loc="left", fontsize=12, pad=8)
-    ax.set_xlabel("Frequency (GHz)")
-    ax.set_ylabel(ylabel)
-    ax.grid(True, alpha=1.0)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.legend(loc="upper right", fontsize=9)
-
-
-def save_case_plot(out_path, nw_hfss, pred_by_model, title):
-    configure_matplotlib()
-    freq_ghz = nw_hfss.f / 1e9
-    fig, axes = plt.subplots(2, 2, figsize=(15, 10), dpi=150)
-    fig.suptitle(title, x=0.02, y=0.985, ha="left", fontsize=16, fontweight="semibold")
-
-    summary_parts = []
-    for model_name, pred_s in pred_by_model.items():
-        mse = np.mean(np.abs(pred_s - nw_hfss.s) ** 2)
-        s21_mae = np.mean(np.abs(db20(pred_s[:, 1, 0]) - db20(nw_hfss.s[:, 1, 0])))
-        summary_parts.append(f"{model_name}: MSE {mse:.3e}, S21 MAE {s21_mae:.3f} dB")
-    fig.text(0.02, 0.953, "    ".join(summary_parts), ha="left", va="top", fontsize=10, color="#475569")
-
-    ports = [(0, 0, "S11"), (1, 0, "S21"), (0, 1, "S12"), (1, 1, "S22")]
-    model_colors = {"mat2": "#dc2626", "mat3": "#059669", "mat4": "#7e22ce"}
-
-    for ax, (m, n, name) in zip(axes.ravel(), ports):
-        ax.plot(freq_ghz, db20(nw_hfss.s[:, m, n]), label="HFSS", color="#1f77b4", linewidth=1.8)
-        for model_name, pred_s in pred_by_model.items():
-            ax.plot(
-                freq_ghz,
-                db20(pred_s[:, m, n]),
-                label=model_name,
-                color=model_colors.get(model_name, "#7e22ce"),
-                linestyle="--",
-                linewidth=1.8,
-            )
-        style_axis(ax, f"{name} magnitude", "Magnitude (dB)")
-
-    fig.subplots_adjust(left=0.07, right=0.98, bottom=0.07, top=0.91, wspace=0.18, hspace=0.28)
-    fig.savefig(out_path)
-    plt.close(fig)
-
-
-def save_summary_plots(out_dir, summary_df, model_names):
-    configure_matplotlib()
-    fig, axes = plt.subplots(1, 2, figsize=(15, 6), dpi=150)
-    fig.suptitle("RDL_Bottom Model Error Summary", x=0.02, y=0.98, ha="left", fontsize=16, fontweight="semibold")
-    fig.text(
-        0.02,
-        0.925,
-        f"Valid cases: {len(summary_df)}    Lower values indicate closer agreement with HFSS",
-        ha="left",
-        fontsize=10,
-        color="#475569",
-    )
-    x = np.arange(len(summary_df))
-    colors = {"mat2": "#dc2626", "mat3": "#059669", "mat4": "#7e22ce"}
-
-    for model in model_names:
-        axes[0].plot(
-            x,
-            summary_df[f"{model}_vs_hfss_complex_mse"].to_numpy(dtype=float),
-            label=model,
-            color=colors.get(model, "#1f77b4"),
-            linewidth=1.5,
-        )
-        axes[1].plot(
-            x,
-            summary_df[f"{model}_vs_hfss_s21_db_mae"].to_numpy(dtype=float),
-            label=model,
-            color=colors.get(model, "#1f77b4"),
-            linewidth=1.5,
-        )
-
-    axes[0].set_yscale("log")
-    axes[0].set_title("Complex S MSE vs HFSS", loc="left", fontsize=12, pad=8)
-    axes[0].set_xlabel("Case index")
-    axes[0].set_ylabel("MSE")
-    axes[1].set_title("S21 magnitude MAE vs HFSS", loc="left", fontsize=12, pad=8)
-    axes[1].set_xlabel("Case index")
-    axes[1].set_ylabel("MAE (dB)")
-
-    for ax in axes:
-        ax.grid(True)
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.legend(loc="upper right", fontsize=9)
-
-    fig.subplots_adjust(left=0.07, right=0.98, bottom=0.12, top=0.84, wspace=0.18)
-    fig.savefig(out_dir / "summary_error_trends.png")
-    plt.close(fig)
 
 
 def compare_models(args):

@@ -1,18 +1,28 @@
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.io as sio
 import skrf as rf
+import matplotlib
 import torch
 import torch.nn as nn
+
+matplotlib.use("Agg")
+
+SRC_DIR = Path(__file__).resolve().parents[2] / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from rdl_tsv_transition.plotting import (
+    db20,
+    save_model_case_plot as save_case_plot,
+    save_model_summary_plots as save_summary_plots,
+)
 
 
 TARGET_PARAMS = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
@@ -192,10 +202,6 @@ def calculate_s_parameters(circuit_params, length_um, freqs_hz):
     return s
 
 
-def db20(value):
-    return 20.0 * np.log10(np.maximum(np.abs(value), 1e-300))
-
-
 def calc_metrics(pred_s, ref_s, label_prefix):
     diff = pred_s - ref_s
     metrics = {
@@ -212,48 +218,6 @@ def calc_metrics(pred_s, ref_s, label_prefix):
             np.mean(np.abs(np.unwrap(np.angle(pred)) - np.unwrap(np.angle(ref)))) * 180.0 / np.pi
         )
     return metrics
-
-
-def configure_matplotlib():
-    plt.rcParams.update({"figure.facecolor": "#f6f8fb", "axes.facecolor": "white", "grid.color": "#e2e8f0"})
-
-
-def save_case_plot(out_path, nw_hfss, pred_by_model, title):
-    configure_matplotlib()
-    freq_ghz = nw_hfss.f / 1e9
-    fig, axes = plt.subplots(2, 2, figsize=(15, 10), dpi=150)
-    fig.suptitle(title, x=0.02, y=0.985, ha="left", fontsize=16, fontweight="semibold")
-    ports = [(0, 0, "S11"), (1, 0, "S21"), (0, 1, "S12"), (1, 1, "S22")]
-    for ax, (m, n, name) in zip(axes.ravel(), ports):
-        ax.plot(freq_ghz, db20(nw_hfss.s[:, m, n]), label="HFSS", linewidth=1.8)
-        for model_name, pred_s in pred_by_model.items():
-            ax.plot(freq_ghz, db20(pred_s[:, m, n]), "--", label=model_name, linewidth=1.5)
-        ax.set_title(f"{name} magnitude", loc="left")
-        ax.set_xlabel("Frequency (GHz)")
-        ax.set_ylabel("Magnitude (dB)")
-        ax.grid(True)
-        ax.legend(fontsize=8)
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.savefig(out_path)
-    plt.close(fig)
-
-
-def save_summary_plots(out_dir, summary_df, model_names):
-    configure_matplotlib()
-    fig, axes = plt.subplots(1, 2, figsize=(15, 6), dpi=150)
-    x = np.arange(len(summary_df))
-    for model in model_names:
-        axes[0].plot(x, summary_df[f"{model}_vs_hfss_complex_mse"].to_numpy(float), label=model)
-        axes[1].plot(x, summary_df[f"{model}_vs_hfss_s21_db_mae"].to_numpy(float), label=model)
-    axes[0].set_yscale("log")
-    axes[0].set_title("Complex S MSE vs HFSS")
-    axes[1].set_title("S21 magnitude MAE vs HFSS")
-    for ax in axes:
-        ax.grid(True)
-        ax.legend()
-    fig.tight_layout()
-    fig.savefig(out_dir / "summary_error_trends.png")
-    plt.close(fig)
 
 
 def build_models(args, base_dir):

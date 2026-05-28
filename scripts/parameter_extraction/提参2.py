@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+import sys
 import numpy as np
 import skrf
 from scipy.interpolate import interp1d
@@ -10,6 +10,12 @@ import os
 from pathlib import Path
 import pandas as pd
 from skrf import Frequency, Network
+
+SRC_DIR = Path(__file__).resolve().parents[2] / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from rdl_tsv_transition.plotting import plot_2ports_Leq, plot_2ports_Req, plot_2ports_S, plot_RLGC
 
 
 def path_S2P(path):
@@ -221,152 +227,6 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
     # return S11_all,S12_all,S21_all,S22_all,Y11_all, Y12_all, Y21_all, Y22_all,R_all,L_all,C_all,G_all,parameter_spice,rmse
     return S11_all,S12_all,S21_all,S22_all,R_all,L_all,C_all,G_all,parameter_spice,rmse
 
-
-def plot_2ports_Leq(Yparameters,names,freqs):
-    fig, axes = plt.subplots(1, 2)  # 4 行 2 
-    for idx, (Yp, freq, name) in enumerate(zip(Yparameters, freqs, names)):
-        # Leq=[]
-        # for f in (freq):
-            # Leq.append(np.imag(1/Yp[0,0])/2/np.pi/f)
-        Leq=(np.imag(1/Yp[0,0])/2/np.pi/freq)
-        Q = np.imag(1/Yp[0,0]) / np.real(1/Yp[0,0])
-        axes[0].plot(freq, Leq, label=f"{name}")
-        axes[1].plot(freq, Q, label=f"{name}")
-
-    axes[0].set_title("Equivalent Inductance", fontsize=12)
-    axes[0].set_xlabel("Frequency (GHz)")
-    axes[0].legend()
-
-    axes[1].set_title("Quality Factor", fontsize=12)
-    axes[1].set_xlabel("Frequency (GHz)")
-    axes[1].legend()
-    # plt.savefig("L_plot.png", dpi=300, bbox_inches='tight')
-    plt.tight_layout()
-    # plt.show()
-
-
-def plot_2ports_Req(Yparameters,names,freqs):
-    fig, axes = plt.subplots(1, 2)  # 4 行 2 
-    for idx, (Yp, freq, name) in enumerate(zip(Yparameters, freqs, names)):
-        # Leq=[]
-        # for f in (freq):
-            # Leq.append(np.imag(1/Yp[0,0])/2/np.pi/f)
-        Req=(np.real(1/Yp[0,0]))
-        Q = np.imag(1/Yp[0,0]) / np.real(1/Yp[0,0])
-        axes[0].plot(freq, Req, label=f"{name}")
-        axes[1].plot(freq, Q, label=f"{name}")
-
-    axes[0].set_title("Equivalent Resistance", fontsize=12)
-    axes[0].set_xlabel("Frequency (GHz)")
-    axes[0].legend()
-
-    axes[1].set_title("Quality Factor", fontsize=12)
-    axes[1].set_xlabel("Frequency (GHz)")
-    axes[1].legend()
-    # plt.savefig("L_plot.png", dpi=300, bbox_inches='tight')
-    plt.tight_layout()
-    # plt.show()
-
-
-
-def plot_2ports_S(Sparameters,names,type,freqs):
-    fig, axes = plt.subplots(2, 4, figsize=(16, 8))  # 4 行 2 列
-
-    if type == "RI":
-        titles = [
-            "S11 Real", "S11 Imag", "S12 Real", "S12 Imag",
-            "S21 Real", "S21 Imag", "S22 Real", "S22 Imag"
-        ]
-        ylabels = ["Real"] * 4 + ["Real"] * 4
-    elif type == "MP":
-        titles = [
-            "S11 |dB|", "S11 Phase", "S12 |dB|", "S12 Phase",
-            "S21 |dB|", "S21 Phase", "S22 |dB|", "S22 Phase"
-        ]
-        ylabels = ["dB", "deg"] * 4
-    else:
-        raise ValueError(f"Unknown type: {type}")
-
-    if type == "RI":
-        for idx, (Sp, name, freq) in enumerate(zip(Sparameters, names, freqs)):
-            axes[0, 0].plot(freq, Sp[0,0].real, label=f"{name}")
-            axes[0, 0].legend()
-            axes[0, 1].plot(freq, Sp[0,0].imag, label=f"{name}")
-            axes[0, 1].legend()
-            axes[0, 2].plot(freq, Sp[0,1].real, label=f"{name}")
-            axes[0, 2].legend()
-            axes[0, 3].plot(freq, Sp[0,1].imag, label=f"{name}")
-            axes[0, 3].legend()
-            axes[1, 0].plot(freq, Sp[1,0].real, label=f"{name}")
-            axes[1, 0].legend()
-            axes[1, 1].plot(freq, Sp[1,0].imag, label=f"{name}")
-            axes[1, 1].legend()
-            axes[1, 2].plot(freq, Sp[1,1].real, label=f"{name}")
-            axes[1, 2].legend()
-            axes[1, 3].plot(freq, Sp[1,1].imag, label=f"{name}")
-            axes[1, 3].legend()
-
-    if type == "MP":
-        for idx, (Sp, name, freq) in enumerate(zip(Sparameters, names, freqs)):
-            axes[0, 0].plot(freq, 20*np.log10(abs(Sp[0,0])), label=f"{name}")
-            axes[0, 0].legend()
-            axes[0, 1].plot(freq, np.angle(Sp[0,0],deg=True), label=f"{name}")
-            axes[0, 1].legend()
-            axes[0, 2].plot(freq, 20*np.log10(abs(Sp[0,1])), label=f"{name}")
-            axes[0, 2].legend()
-            axes[0, 3].plot(freq, np.angle(Sp[0,1],deg=True), label=f"{name}")
-            axes[0, 3].legend()
-            axes[1, 0].plot(freq, 20*np.log10(abs(Sp[1,0])), label=f"{name}")
-            axes[1, 0].legend()
-            axes[1, 1].plot(freq, np.angle(Sp[1,0],deg=True), label=f"{name}")
-            axes[1, 1].legend()
-            axes[1, 2].plot(freq, 20*np.log10(abs(Sp[1,1])), label=f"{name}")
-            axes[1, 2].legend()
-            axes[1, 3].plot(freq, np.angle(Sp[1,1],deg=True), label=f"{name}")
-            axes[1, 3].legend()
-
-    # 添加标题、坐标轴标签、图例
-    for i in range(2):
-        for j in range(4):
-            axes[i, j].set_title(titles[i * 4 + j], fontsize=12)
-            axes[i, j].set_xlabel("Frequency (GHz)")
-            axes[i, j].set_ylabel(ylabels[i * 4 + j])
-            axes[i, j].legend()
-
-    fig.suptitle(f"S-Parameter Plot ({type})", fontsize=16)
-    plt.tight_layout(rect=[0, 0, 1, 0.96])  # 留出标题空间
-    # plt.savefig("S_plot.png", dpi=300, bbox_inches='tight')
-    # plt.show()
-    
-
-
-def plot_RLGC(RLGCs,freqs,names):
-    fig, axes = plt.subplots(2, 2, figsize=(10, 8))  # 2 行 2 列
-
-    titles = ["R", "L", "G", "C"]
-    ylabels = ["Resistance (Ohm)", "Inductance (H)", "Conductance (S)", "Capacitance (F)"]
-
-    for idx, (RLGC, freq,name) in enumerate(zip(RLGCs, freqs,names)):
-        axes[0,0].plot(freq, RLGC[0], label=f"{name}")
-        axes[0,0].set_title(titles[0])
-        axes[0,0].set_xlabel("Frequency (GHz)")
-        axes[0,0].legend()
-        axes[0,1].plot(freq, RLGC[1], label=f"{name}")
-        axes[0,1].set_title(titles[1])
-        axes[0,1].set_xlabel("Frequency (GHz)")
-        axes[0,1].legend()
-        axes[1,0].plot(freq, RLGC[2], label=f"{name}")
-        axes[1,0].set_title(titles[2])
-        axes[1,0].set_xlabel("Frequency (GHz)")
-        axes[1,0].legend()
-        axes[1,1].plot(freq, RLGC[3], label=f"{name}")
-        axes[1,1].set_title(titles[3])
-        axes[1,1].set_xlabel("Frequency (GHz)")
-        axes[1,1].legend()
-
-    plt.tight_layout()
-    # plt.show()
-    
 
 def find_resonation_frequency(Y11):
     Q = np.imag(1/Y11) / np.real(1/Y11)
