@@ -180,16 +180,16 @@ def plot_2ports_S(Sparameters, names, type, freqs):
 
     if type == "RI":
         titles = [
-            "S11 Real",
-            "S11 Imag",
-            "S12 Real",
-            "S12 Imag",
-            "S21 Real",
-            "S21 Imag",
-            "S22 Real",
-            "S22 Imag",
+            "Real(S11)",
+            "Imag(S11)",
+            "Real(S12)",
+            "Imag(S12)",
+            "Real(S21)",
+            "Imag(S21)",
+            "Real(S22)",
+            "Imag(S22)",
         ]
-        ylabels = ["Real"] * 8
+        ylabels = ["Real"] * 4 + ["Imag"] * 4
         extractors = [
             lambda Sp: Sp[0, 0].real,
             lambda Sp: Sp[0, 0].imag,
@@ -202,14 +202,14 @@ def plot_2ports_S(Sparameters, names, type, freqs):
         ]
     elif type == "MP":
         titles = [
-            "S11 |dB|",
-            "S11 Phase",
-            "S12 |dB|",
-            "S12 Phase",
-            "S21 |dB|",
-            "S21 Phase",
-            "S22 |dB|",
-            "S22 Phase",
+            "dB(S11)",
+            "Phase(S11)",
+            "dB(S12)",
+            "Phase(S12)",
+            "dB(S21)",
+            "Phase(S21)",
+            "dB(S22)",
+            "Phase(S22)",
         ]
         ylabels = ["dB", "deg"] * 4
         extractors = [
