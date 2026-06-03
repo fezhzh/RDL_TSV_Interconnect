@@ -254,12 +254,16 @@ def plot_2ports_S(Sparameters, names, type, freqs):
 
 def plot_RLGC(RLGCs, freqs, names):
     fig, axes = plt.subplots(2, 2, figsize=(10, 8))
-    titles = ["R", "L", "G", "C"]
-    ylabels = ["Resistance (Ohm)", "Inductance (H)", "Conductance (S)", "Capacitance (F)"]
+    plot_specs = [
+        (axes[0, 0], 0, "R", "Resistance (Ohm)"),
+        (axes[0, 1], 2, "G", "Conductance (S)"),
+        (axes[1, 0], 1, "L", "Inductance (H)"),
+        (axes[1, 1], 3, "C", "Capacitance (F)"),
+    ]
 
     for RLGC, freq, name in zip(RLGCs, freqs, names):
-        for ax, values, title, ylabel in zip(axes.ravel(), RLGC, titles, ylabels):
-            ax.plot(freq, values, label=f"{name}")
+        for ax, value_idx, title, ylabel in plot_specs:
+            ax.plot(freq, RLGC[value_idx], label=f"{name}")
             ax.set_title(title)
             ax.set_xlabel("Frequency (GHz)")
             ax.set_ylabel(ylabel)
