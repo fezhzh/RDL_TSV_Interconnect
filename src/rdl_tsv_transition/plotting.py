@@ -46,11 +46,17 @@ def configure_comparison_matplotlib() -> None:
     )
 
 
+def set_inward_ticks(ax) -> None:
+    """Use inward-facing ticks on both axes."""
+    ax.tick_params(axis="both", which="both", direction="in", top=True, right=True)
+
+
 def style_frequency_axis(ax, title: str, ylabel: str) -> None:
     ax.set_title(title, loc="left", fontsize=12, pad=8)
     ax.set_xlabel("Frequency (GHz)")
     ax.set_ylabel(ylabel)
     ax.grid(True, alpha=1.0)
+    set_inward_ticks(ax)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.legend(loc="upper right", fontsize=9)
@@ -132,6 +138,7 @@ def save_model_summary_plots(out_dir, summary_df, model_names: Sequence[str]) ->
 
     for ax in axes:
         ax.grid(True)
+        set_inward_ticks(ax)
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
         ax.legend(loc="upper right", fontsize=9)
@@ -151,9 +158,11 @@ def plot_2ports_Leq(Yparameters, names, freqs):
 
     axes[0].set_title("Equivalent Inductance", fontsize=12)
     axes[0].set_xlabel("Frequency (GHz)")
+    set_inward_ticks(axes[0])
     axes[0].legend()
     axes[1].set_title("Quality Factor", fontsize=12)
     axes[1].set_xlabel("Frequency (GHz)")
+    set_inward_ticks(axes[1])
     axes[1].legend()
     plt.tight_layout()
 
@@ -168,9 +177,11 @@ def plot_2ports_Req(Yparameters, names, freqs):
 
     axes[0].set_title("Equivalent Resistance", fontsize=12)
     axes[0].set_xlabel("Frequency (GHz)")
+    set_inward_ticks(axes[0])
     axes[0].legend()
     axes[1].set_title("Quality Factor", fontsize=12)
     axes[1].set_xlabel("Frequency (GHz)")
+    set_inward_ticks(axes[1])
     axes[1].legend()
     plt.tight_layout()
 
@@ -234,6 +245,7 @@ def plot_2ports_S(Sparameters, names, type, freqs):
         ax.set_title(title, fontsize=12)
         ax.set_xlabel("Frequency (GHz)")
         ax.set_ylabel(ylabel)
+        set_inward_ticks(ax)
         ax.legend()
 
     fig.suptitle(f"S-Parameter Plot ({type})", fontsize=16)
@@ -251,6 +263,7 @@ def plot_RLGC(RLGCs, freqs, names):
             ax.set_title(title)
             ax.set_xlabel("Frequency (GHz)")
             ax.set_ylabel(ylabel)
+            set_inward_ticks(ax)
             ax.legend()
 
     plt.tight_layout()
