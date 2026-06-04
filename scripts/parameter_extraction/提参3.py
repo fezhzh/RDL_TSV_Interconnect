@@ -65,6 +65,8 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
         p1 = 0
     if p2 is None:
         p2 = len(freq)-1
+    eps = 1e-30
+
     def error_RL(k1,R,L):
         r,l=[],[]
         R1,R2,R3=k1[0],k1[1],k1[2]
@@ -76,20 +78,20 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
             r.append(R_RLGC)
             l.append(L_RLGC)
         error=[]
-        for kk in [p1,p2]:#
-            # if(not(40<=kk<=50)):
+        for kk in range(p1,p2):
             error1=(r[kk]-R[kk])/R[-1]
             error.append(error1)
-        for kk in [p1,p2]:#
-            # if(not(40<=kk<=50)):
-            error2=(l[kk]-L[kk])/L[p2]
+        for kk in range(p1,p2):
+            error2=(l[kk]-L[kk])/L[-1]
             error.append(error2)
         return error
-    Rdc,Ldc,Gdc,Cdc=R[0],L[0],G[0],C[0]
+    Rdc,Ldc,Gdc,Cdc=R[p1],L[p1],G[0],C[0]
     Rhf,Lhf,Ghf,Chf=R[p2],L[p2],G[p2],C[p2]
     #拼接成等效电路值
     R3=abs(R[p2//2])
     L3=abs(Ldc-L[p2//2])
+    R3=0.8*(Rhf-Rdc)
+    L3=0.5*(Ldc-Lhf)
     R1=abs(Rhf-R3)
     # R2=abs(R1*Rdc/(R1-Rdc))
     R2=abs(1.0/(1.0/Rdc-1.0/R1))
@@ -101,17 +103,20 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
     #    [R1*2, R2*2, R3*2, L1*2*1e9, L2*2*1e9, L3*2*1e9])
     # bounds1 = ([R1*0.10, R2*0.10, R3*0.10, L1*0.10*1e9, L2*0.10*1e9, L3*0.10*1e9],
     #    [R1*10, R2*10, R3*10, L1*10*1e9, L2*10*1e9, L3*10*1e9])
-    bounds1 = ([R1*0.2, R2*0.2, R3*0.2, L1*0.25*1e9, L2*0.2*1e9, L3*0.2*1e9],
-       [R1*5, R2*5, R3*5, L1*5*1e9, L2*5*1e9, L3*5*1e9])    
-    # print(bounds1)
+    bounds1 = ([R1*0.1, R2*0.1, R3*0.1, L1*0.1*1e9, L2*0.1*1e9, L3*0.1*1e9],
+               [R1*10, R2*10, R3*10, L1*10*1e9, L2*10*1e9, L3*10*1e9])    
+
     k1 = np.array([R1,R2,R3,L1*1e9,L2*1e9,L3*1e9])
     Para = least_squares(error_RL, k1,bounds=bounds1,args=(R,L))
     residuals = Para.fun
-    rmse = np.sqrt(np.mean(residuals**2))
+    rmse_rl = np.sqrt(np.mean(residuals**2))
     R1,R2,R3,L1,L2,L3=Para.x
     L1=L1*1e-9
     L2=L2*1e-9
     L3=L3*1e-9
+    
+    # print(R1/k1[0],R2/k1[1],R3/k1[2],L1/k1[3]*1e9,L2/k1[4]*1e9,L3/k1[5]*1e9)
+    # print(R3/(Rhf-Rdc),L3/(Ldc-Lhf))
 
     def error_GC(k1,G,C):
         gg,cc=[],[]
@@ -146,13 +151,13 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
     # print("L3", L3, bounds1[0][5], bounds1[1][5])
 
 
-    bounds1 = ([C1*0.2*1e12, C2*0.2*1e12, Rsi*0.2],
-       [C1*5*1e12, C2*5*1e12, Rsi*5])    
-    k1 = np.array([C1*1e12, C2*1e12, Rsi])
+    bounds1 = ([C1*0.1*1e12, C2*0.1*1e12, Rsi*0.1],
+       [C1*10*1e12, C2*10*1e12, Rsi*10])    
+    k2 = np.array([C1*1e12, C2*1e12, Rsi])
     # print(bounds1)
-    Para = least_squares(error_GC, k1,bounds=bounds1,args=(G,C))
+    Para = least_squares(error_GC, k2,bounds=bounds1,args=(G,C))
     residuals = Para.fun
-    rmse = np.sqrt(np.mean(residuals**2))
+    rmse_gc = np.sqrt(np.mean(residuals**2))
     Cox,Csi,Rsi=Para.x
     Cox=Cox*1e-12
     Csi=Csi*1e-12
@@ -161,6 +166,11 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
     # print("Csi", Csi, bounds1[0][1], bounds1[1][1])
     # print("Rsi", Rsi, bounds1[0][2], bounds1[1][2])
     # print("#######################")
+    
+    scale_max = max(R1/k1[0],R2/k1[1],R3/k1[2],L1/k1[3]*1e9,L2/k1[4]*1e9,L3/k1[5]*1e9,Cox/k2[0]*1e12,Csi/k2[1]*1e12,Rsi/k2[2])
+    scale_min = min(R1/k1[0],R2/k1[1],R3/k1[2],L1/k1[3]*1e9,L2/k1[4]*1e9,L3/k1[5]*1e9,Cox/k2[0]*1e12,Csi/k2[1]*1e12,Rsi/k2[2])
+    # print(Cox/k2[0]*1e12,Csi/k2[1]*1e12,Rsi/k2[2])
+
 
     parameter_spice=np.empty(9)
     values = [R1,R2,R3,L1*1e9,L2*1e9,L3*1e9,Cox*1e12,Csi*1e12,Rsi]
@@ -204,7 +214,8 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
     # Yps=skrf.s2y(s_ntw.s)
     # Y11_all, Y12_all, Y21_all, Y22_all = Yps[:, 0, 0], Yps[:, 0, 1], Yps[:, 1, 0], Yps[:, 1, 1]
     # return S11_all,S12_all,S21_all,S22_all,Y11_all, Y12_all, Y21_all, Y22_all,R_all,L_all,C_all,G_all,parameter_spice,rmse
-    return S11_all,S12_all,S21_all,S22_all,R_all,L_all,C_all,G_all,parameter_spice,rmse
+    rmse = max(rmse_rl, rmse_gc)
+    return S11_all,S12_all,S21_all,S22_all,R_all,L_all,C_all,G_all,parameter_spice,rmse,scale_max,scale_min
 
 
 def find_resonation_frequency(Y11):
@@ -226,7 +237,7 @@ if __name__ == '__main__':
     csv_data = []
 
     # 处理多个文件 dut0.s4p 到 dut3000.s4p
-    for i in range(0, 300, 1):  
+    for i in range(0, 1500, 1):  
         momentum_path = fr"./data/sparameters/RDL_Bottom_Snp/dut{i}.s2p"  # 请确保路径与您实际存放的路径一致
         
         if not os.path.exists(momentum_path):  
@@ -286,7 +297,7 @@ if __name__ == '__main__':
 
         RLGC1=[R_l,L_l,G_l,C_l]
 
-        S11,S12,S21,S22,R_all,L_all,C_all,G_all,parameter_spice,rmse=RLGC_SPICE_rlgc_way3(R_l,L_l,G_l,C_l,parameter_L,freq,p1=p1,p2=p2)
+        S11,S12,S21,S22,R_all,L_all,C_all,G_all,parameter_spice,rmse,scale_max,scale_min=RLGC_SPICE_rlgc_way3(R_l,L_l,G_l,C_l,parameter_L,freq,p1=p1,p2=p2)
         sp2=np.array([[S11, S12],[S21, S22]]) 
         RLGC2=[R_all,L_all,G_all,C_all]
 
@@ -296,22 +307,35 @@ if __name__ == '__main__':
  
 
 
-        # 绘图
-        plot_extraction_comparison(
-            RLGCs=RLGCs,
-            sparameters=sps,
-            freqs=freqs,
-            names=["Simulated", "Fitting"],
-        )
+        # # 绘图
+        # plot_extraction_comparison(
+        #     RLGCs=RLGCs,
+        #     sparameters=sps,
+        #     freqs=freqs,
+        #     names=["HFSS", "Model"],
+        # )
+
+        # sps = [sp2]
+        # freqs = [freq]       
+        # RLGCs=[RLGC2]
+        # names=["Model"]
+ 
+
+        # plot_extraction_comparison(
+        #     RLGCs=RLGCs,
+        #     sparameters=sps,
+        #     freqs=freqs,
+        #     names=names,
+        # )
         
 
         # 导出提取得到的参数
-        # output_csv_path = r"./data/tables/RDL_Bottom_TD_4.csv" 
-        # csv_row = [l_rdl, w_rdl, t_rdl, h_tsv, p_rdl]+list(parameter_spice)+[rmse]
-        # csv_data.append(csv_row)
-        # csv_headers = ["l_rdl", "w_rdl", "t_rdl", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
-        # # csv_headers = ["d_tsv", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
-        # df = pd.DataFrame(csv_data, columns=csv_headers)
-        # df.to_csv(output_csv_path, index=False)
-        # print(f"dut{i}参数保存到：{output_csv_path}")
+        output_csv_path = r"./data/tables/RDL_Bottom_TD_4.csv" 
+        csv_row = [l_rdl, w_rdl, t_rdl, h_tsv, p_rdl]+list(parameter_spice)+[rmse,scale_max,scale_min]
+        csv_data.append(csv_row)
+        csv_headers = ["l_rdl", "w_rdl", "t_rdl", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse","scale_max","scale_min"]
+        # csv_headers = ["d_tsv", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
+        df = pd.DataFrame(csv_data, columns=csv_headers)
+        df.to_csv(output_csv_path, index=False)
+        print(f"dut{i}参数保存到：{output_csv_path}")
 
