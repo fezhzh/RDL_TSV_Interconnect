@@ -151,8 +151,7 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
     # print("L3", L3, bounds1[0][5], bounds1[1][5])
 
 
-    bounds1 = ([C1*0.1*1e12, C2*0.1*1e12, Rsi*0.1],
-       [C1*10*1e12, C2*10*1e12, Rsi*10])    
+    bounds1 = ([C1*0.1*1e12, C2*0.1*1e12, Rsi*0.1], [C1*10*1e12, C2*10*1e12, Rsi*10])    
     k2 = np.array([C1*1e12, C2*1e12, Rsi])
     # print(bounds1)
     Para = least_squares(error_GC, k2,bounds=bounds1,args=(G,C))
