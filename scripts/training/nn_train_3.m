@@ -4,12 +4,12 @@ close all
 clear all
 
 
-data1 = xlsread("./data/tables/RDL_Bottom_TD_4.csv");
+data1 = xlsread("../../data/tables/RDL_Bottom_TD_4_.csv");
 data = data1;%+data2;
 % fit_list = [6:14];%
 fit_list = [6:14];%
 name_list = ["R1","R2","R3","L1", "L2", "L3", "Cox", "Csi", "Rsi"];%
-iterate = 10;%
+iterate = 1;%
 MaxErrorLists=[];
 AverageErrorLists=[];
 
@@ -22,7 +22,7 @@ if ~isempty(data)
     for j = 1:1:size(fit_list,2)
 
             
-        input = data(:,[1:3]);
+        input = data(:,[1:5]);
         output_v = data(:,fit_list(j));
         output_vref = data(:,fit_list(j));
     
@@ -52,7 +52,7 @@ if ~isempty(data)
         end
         MaxErrorLists=[MaxErrorLists;[j,MaxErrorList]];
         AverageErrorLists=[AverageErrorLists;[j,AverageErrorList]];
-        NN_export(net_p,input,output_v,strcat('./data/matlab_models/RDL_TSV_mat4/RDL_Bottom_',name_list(j),'.mat'),name_list(j))
+        NN_export(net_p,input,output_v,strcat('../../data/matlab_models/RDL_TSV_mat4/RDL_Bottom_',name_list(j),'.mat'),name_list(j))
         clearvars net*
     end
 
@@ -70,7 +70,7 @@ function net=NN_train(x,t)
     % 'trainlm' is usually fastest; 'trainbr' takes longer but may be better for challenging problems;'trainscg' uses less memory. Suitable in low memory situations.
     trainFcn = 'trainbr';  % Levenberg-Marquardt backpropagation.
     net = feedforwardnet([20,20],trainFcn);
-    net.trainParam.epochs=500;
+    net.trainParam.epochs=2000;
     net.input.processFcns = {'removeconstantrows','mapminmax'};
     net.output.processFcns = {'removeconstantrows','mapminmax'};
 
@@ -199,6 +199,11 @@ function NN_export(net_p,input,output,matname,valname)
     theta2 = net_p.b{2}';
     w3 = net_p.lw{3,2}';
     theta3 = net_p.b{3}';
+
+    matdir = fileparts(matname);
+    if ~isempty(matdir) && ~exist(matdir, 'dir')
+        mkdir(matdir);
+    end
 
     save(matname,'psmax', 'psmin', 'w1', 'theta1', 'w2', 'theta2', 'w3', 'theta3', 'outputmax', 'outputmin','valname')
     
