@@ -1,22 +1,20 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
-RDL/TSV 级联 + 过渡结构建模 + 共享过渡结构神经网络训练入口。
+RDL/TSV 绾ц仈 + 杩囨浮缁撴瀯寤烘ā + 鍏变韩杩囨浮缁撴瀯绁炵粡缃戠粶璁粌鍏ュ彛銆?
+璇ユ枃浠朵繚鐣欎负鍏煎鍏ュ彛锛涘叿浣撳疄鐜板凡鎸夊姛鑳芥媶鍒嗗埌 rdl_tsv_transition 鍖咃細
+    constants.py      鍏ㄥ眬甯搁噺鍜屽櫒浠?杩囨浮缁撴瀯绾﹀畾
+    utils.py          璺緞銆丯etwork銆丼/ABCD 杞崲鍜岀骇鑱斿伐鍏?    io.py             s2p 澶撮儴鍑犱綍鍙傛暟瑙ｆ瀽
+    devices.py        RDL/TSV 鍣ㄤ欢鍧楁瀯閫犱笌闀垮害缂╂斁
+    matlab_nn.py      璋冪敤 MATLAB 瀵煎嚭鐨?.mat 绁炵粡缃戠粶
+    circuit.py        绛夋晥鐢佃矾鍙傛暟 -> RLGC -> ABCD/Network
+    transition.py     杩囨浮缁撴瀯鍏冧欢鎻愬彇銆丄BCD 鏋勯€犲拰绾ц仈
+    model.py          杩囨浮缁撴瀯 NN銆佺壒寰佹瀯閫犮€佺洃鐫ｈ缁冨拰棰勬祴
+    torch_cascade.py  PyTorch 绔埌绔骇鑱斿拰鍗?DUT 寰皟
+    metrics_plot.py   MSE 璇勪及銆佹眹鎬诲拰缁樺浘
+    persistence.py    鍏抽敭涓棿缁撴灉淇濆瓨
+    dataset.py        澶?DUT 鏁版嵁闆嗚缁冧富娴佺▼
 
-该文件保留为兼容入口；具体实现已按功能拆分到 rdl_tsv_transition 包：
-    constants.py      全局常量和器件/过渡结构约定
-    utils.py          路径、Network、S/ABCD 转换和级联工具
-    io.py             s2p 头部几何参数解析
-    devices.py        RDL/TSV 器件块构造与长度缩放
-    matlab_nn.py      调用 MATLAB 导出的 .mat 神经网络
-    circuit.py        等效电路参数 -> RLGC -> ABCD/Network
-    transition.py     过渡结构元件提取、ABCD 构造和级联
-    model.py          过渡结构 NN、特征构造、监督训练和预测
-    torch_cascade.py  PyTorch 端到端级联和单 DUT 微调
-    metrics_plot.py   MSE 评估、汇总和绘图
-    persistence.py    关键中间结果保存
-    dataset.py        多 DUT 数据集训练主流程
-
-运行后默认在 ./outputs/training/RDL_TSV_results/intermediate 下保存：
+杩愯鍚庨粯璁ゅ湪 ./model_results/training/RDL_TSV_results/intermediate 涓嬩繚瀛橈細
     dutXXX/metadata.json
     dutXXX/sample_arrays.npz
     dutXXX/evaluation_arrays.npz
@@ -120,13 +118,13 @@ __all__ = [name for name in globals() if not name.startswith("_")]
 
 
 if __name__ == "__main__":
-    # 推荐用多个不同尺寸 DUT 共同训练共享过渡模型。
-    # 若只想使用提参脚本中前 300 个频点，可设置 max_points=300。
+    # Train the shared transition model across multiple DUT sizes.
+    # Set max_points=300 to use only the first 300 frequency points.
     run_dataset_training(
         start_idx=1,
         end_idx=10,
-        s2p_dir="./data/sparameters/RDL_TSV_Snp",
-        mat_dir="./data/matlab_models/RDL_TSV_mat2",
+        s2p_dir="./snp_data/RDL_TSV_Snp",
+        mat_dir="./device_models/RDL_TSV_mat2",
         max_points=None,
         supervised_epochs=2000,
         fine_epochs=1000,
@@ -138,7 +136,8 @@ if __name__ == "__main__":
         fine_sample_batch_size=2,
         plot=True,
         save_plot=False,
-        out_dir="./outputs/training/RDL_TSV_results",
+        out_dir="./model_results/training/RDL_TSV_results",
         save_intermediate=True,
         verbose=True,
     )
+

@@ -87,7 +87,7 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
         return error
     Rdc,Ldc,Gdc,Cdc=R[p1],L[p1],G[0],C[0]
     Rhf,Lhf,Ghf,Chf=R[p2],L[p2],G[p2],C[p2]
-    #拼接成等效电路值
+    # 拼接成等效电路值
     R3=abs(R[p2//2])
     L3=abs(Ldc-L[p2//2])
     R3=0.8*(Rhf-Rdc)
@@ -178,7 +178,7 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
         parameter_spice[kk]=values[kk]
 
 
-    #计算得到S参数
+    # 计算得到S参数
     R_all,L_all,G_all,C_all=[],[],[],[]
     S11_all,S12_all,S21_all,S22_all=[],[],[],[]
     Sps=[]
@@ -229,15 +229,15 @@ def find_resonation_frequency(Y11):
 #######主函数部分##########################
 if __name__ == '__main__':
 
-    os.chdir(Path(__file__).resolve().parents[2])  # 切换到脚本所在目录（可选）
+    os.chdir(Path(__file__).resolve().parents[2])  # 切换到项目根目录
     # output_csv_path = r"D:\MLIN\SNP\output_variables_real_0628.csv"
-        #输入1-150Ghz长度为L的EM数据，长度为100um的EM数据,L的长度
+        # 输入1-150GHz长度为L的EM数据，长度为100um的EM数据，L的长度
     # 初始化 CSV 数据存储列表
     csv_data = []
 
-    # 处理多个文件 dut0.s4p 到 dut3000.s4p
+    # 处理多个文件 dut0.s2p 到 dut1499.s2p
     for i in range(0, 1500, 1):  
-        momentum_path = fr"./data/sparameters/RDL_Bottom_Snp/dut{i}.s2p"  # 请确保路径与您实际存放的路径一致
+        momentum_path = fr"./snp_data/RDL_Bottom_Snp/dut{i}.s2p"  # 请确保路径与实际存放路径一致
         
         if not os.path.exists(momentum_path):  
             print(f"文件 {momentum_path} 不存在，跳过")
@@ -250,7 +250,7 @@ if __name__ == '__main__':
             for line in file:
                 line = line.strip()
                 
-                # 遇到 "#" 说明注释块结束，进入了 S 参数数据区，直接跳出循环节省算力
+                # 遇到 "#" 说明注释块结束，进入 S 参数数据区，直接跳出循环节省算力
                 if line.startswith('#'):
                     break
                     
@@ -267,7 +267,7 @@ if __name__ == '__main__':
                             value = float(match.group(1))
                             variables[var_name] = value
         
-        # 2. 根据 RDL_top 的变量名获取具体数值
+        # 2. 根据 RDL Bottom 的变量名获取具体数值
         # 提取出来的数值默认不带单位（比如 "100um" 提取出来是浮点数 100.0）
 
         l_rdl = variables.get('ldown')
@@ -329,7 +329,7 @@ if __name__ == '__main__':
         
 
         # 导出提取得到的参数
-        output_csv_path = r"./data/tables/RDL_Bottom_TD_4.csv" 
+        output_csv_path = r"./training_datasets/RDL_Bottom_TD_4.csv" 
         csv_row = [l_rdl, w_rdl, t_rdl, h_tsv, p_rdl]+list(parameter_spice)+[rmse,scale_max,scale_min]
         csv_data.append(csv_row)
         csv_headers = ["l_rdl", "w_rdl", "t_rdl", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse","scale_max","scale_min"]
@@ -337,4 +337,5 @@ if __name__ == '__main__':
         df = pd.DataFrame(csv_data, columns=csv_headers)
         df.to_csv(output_csv_path, index=False)
         print(f"dut{i}参数保存到：{output_csv_path}")
+
 

@@ -1,14 +1,17 @@
-
+﻿
 cd(fileparts(mfilename('fullpath')));
 close all
 clear all
 
 
-data1 = xlsread("../../data/tables/RDL_Bottom_TD_4_.csv");
-data = data1;%+data2;
-% fit_list = [6:14];%
-fit_list = [6:14];%
-name_list = ["R1","R2","R3","L1", "L2", "L3", "Cox", "Csi", "Rsi"];%
+data_file = "../../training_datasets/RDL_Top_TD_4.csv";
+model_dir = "../../device_models/RDL_TSV_mat4";
+model_prefix = "RDL_Top_";
+
+data = readmatrix(data_file);
+input_list = 1:5; % l_rdl, w_rdl, t_rdl, h_tsv, p_rdl
+fit_list = 6:14;
+name_list = ["R1","R2","R3","L1", "L2", "L3", "Cox", "Csi", "Rsi"];
 iterate = 1;%
 MaxErrorLists=[];
 AverageErrorLists=[];
@@ -22,7 +25,7 @@ if ~isempty(data)
     for j = 1:1:size(fit_list,2)
 
             
-        input = data(:,[1:5]);
+        input = data(:,input_list);
         output_v = data(:,fit_list(j));
         output_vref = data(:,fit_list(j));
     
@@ -52,7 +55,7 @@ if ~isempty(data)
         end
         MaxErrorLists=[MaxErrorLists;[j,MaxErrorList]];
         AverageErrorLists=[AverageErrorLists;[j,AverageErrorList]];
-        NN_export(net_p,input,output_v,strcat('../../data/matlab_models/RDL_TSV_mat4/RDL_Bottom_',name_list(j),'.mat'),name_list(j))
+        NN_export(net_p,input,output_v,fullfile(model_dir, strcat(model_prefix, name_list(j), ".mat")),name_list(j))
         clearvars net*
     end
 
@@ -81,8 +84,7 @@ function net=NN_train(x,t)
     net.divideParam.testRatio = 15/100;
 
     net.performFcn = 'mse';  % Mean Squared Error
-    net.plotFcns = {'plotperform','plottrainstate','ploterrhist', ...
-        'plotregression', 'plotfit'};
+    net.plotFcns = {};
 
     % Train the Network
     [net,tr] = train(net,x,t);
@@ -208,4 +210,5 @@ function NN_export(net_p,input,output,matname,valname)
     save(matname,'psmax', 'psmin', 'w1', 'theta1', 'w2', 'theta2', 'w3', 'theta3', 'outputmax', 'outputmin','valname')
     
 end
+
 

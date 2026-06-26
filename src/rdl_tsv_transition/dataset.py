@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-"""多 DUT 数据集准备、共享训练、端到端微调和评估入口。"""
+﻿# -*- coding: utf-8 -*-
+"""Multi-DUT dataset preparation, shared training, fine-tuning, and evaluation."""
 
 import copy
 import os
@@ -49,7 +49,7 @@ from .utils import as_abs_path, cascade_abcd_np, load_hfss_network, network_from
 
 @dataclass
 class StructureSample:
-    """一个整体结构 DUT 样本，包含 HFSS 目标、器件级联基准和过渡结构监督目标。"""
+    """One full-structure DUT sample with HFSS target and transition supervision."""
 
     idx: int
     s2p_file: str
@@ -74,19 +74,16 @@ def prepare_structure_sample(
     verbose: bool = True,
 ) -> Optional[StructureSample]:
     """
-    准备单个 DUT 样本，但不在这里训练 NN。
-
-    完成：HFSS 读取、头部几何参数解析、MATLAB .mat 提参、RLGC/ABCD 级联、
-    过渡结构提取，以及监督训练样本 X/Y 生成。
-    """
+    鍑嗗鍗曚釜 DUT 鏍锋湰锛屼絾涓嶅湪杩欓噷璁粌 NN銆?
+    瀹屾垚锛欻FSS 璇诲彇銆佸ご閮ㄥ嚑浣曞弬鏁拌В鏋愩€丮ATLAB .mat 鎻愬弬銆丷LGC/ABCD 绾ц仈銆?    杩囨浮缁撴瀯鎻愬彇锛屼互鍙婄洃鐫ｈ缁冩牱鏈?X/Y 鐢熸垚銆?    """
     s2p_file = os.path.join(s2p_dir_abs, f"dut{idx}.s2p")
     if not os.path.exists(s2p_file):
         if verbose:
-            print(f"[跳过] 文件不存在: {s2p_file}")
+            print(f"[璺宠繃] 鏂囦欢涓嶅瓨鍦? {s2p_file}")
         return None
 
     if verbose:
-        print(f"\n>>> 准备数据样本 dut{idx}: {s2p_file}")
+        print(f"\n>>> 鍑嗗鏁版嵁鏍锋湰 dut{idx}: {s2p_file}")
 
     hfss_nw = load_hfss_network(s2p_file, max_points=max_points)
     hfss_nw.name = "HFSS"
@@ -155,7 +152,7 @@ def collect_structure_samples(
             samples.append(sample)
 
     if not samples:
-        raise RuntimeError(f"没有找到可用 DUT 样本。请检查 s2p_dir={s2p_dir_abs}, idx={start_idx}..{end_idx}")
+        raise RuntimeError(f"娌℃湁鎵惧埌鍙敤 DUT 鏍锋湰銆傝妫€鏌?s2p_dir={s2p_dir_abs}, idx={start_idx}..{end_idx}")
 
     return samples
 
@@ -167,7 +164,7 @@ def evaluate_sample_with_transition_model(
     name: str,
     device: Optional[torch.device] = None,
 ) -> Tuple[rf.Network, np.ndarray]:
-    """用共享过渡结构 NN 预测某个 DUT 的过渡元件值，并级联得到整体 Network。"""
+    """Predict transition elements for one DUT and cascade them into a Network."""
     if device is None:
         device = next(model.parameters()).device
 
@@ -195,13 +192,12 @@ def fine_tune_transition_nn_on_dataset(
     verbose: bool = True,
 ) -> Tuple[TransitionElementNN, Dict[str, List[float]]]:
     """
-    以多个 DUT 的 HFSS 整体 S 参数为共同目标，端到端微调同一个共享过渡结构 NN。
-
+    浠ュ涓?DUT 鐨?HFSS 鏁翠綋 S 鍙傛暟涓哄叡鍚岀洰鏍囷紝绔埌绔井璋冨悓涓€涓叡浜繃娓＄粨鏋?NN銆?
     loss = mean_over_DUT(MSE(S_pred, S_HFSS))
            + reg_weight * mean_over_DUT(MSE(log_element_pred_norm, log_element_extracted_norm))
     """
     if not samples:
-        raise ValueError("samples 不能为空")
+        raise ValueError("samples 涓嶈兘涓虹┖")
 
     if device is None:
         device = next(model.parameters()).device
@@ -270,7 +266,7 @@ def fine_tune_transition_nn_on_dataset(
             loss = loss_s + reg_weight * loss_reg
 
             if not torch.isfinite(loss):
-                raise FloatingPointError(f"端到端数据集训练出现 NaN/Inf，epoch={epoch}")
+                raise FloatingPointError(f"绔埌绔暟鎹泦璁粌鍑虹幇 NaN/Inf锛宔poch={epoch}")
 
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=2.0)
@@ -312,8 +308,8 @@ def fine_tune_transition_nn_on_dataset(
 def run_dataset_training(
     start_idx: int = 1,
     end_idx: int = 10,
-    s2p_dir: str = "./data/sparameters/RDL_TSV_Snp",
-    mat_dir: str = "./data/matlab_models/RDL_TSV_mat2",
+    s2p_dir: str = "./snp_data/RDL_TSV_Snp",
+    mat_dir: str = "./device_models/RDL_TSV_mat2",
     max_points: Optional[int] = None,
     supervised_epochs: int = 1000,
     fine_epochs: int = 300,
@@ -325,26 +321,21 @@ def run_dataset_training(
     fine_sample_batch_size: int = 2,
     plot: bool = True,
     save_plot: bool = False,
-    out_dir: str = "./outputs/training/RDL_TSV_results",
+    out_dir: str = "./model_results/training/RDL_TSV_results",
     save_intermediate: bool = True,
     verbose: bool = True,
 ) -> Dict[str, object]:
     """
-    推荐主入口：使用多个不同尺寸 DUT 共同训练一个可缩放过渡结构模型。
-
-    训练流程：
-    1. 对 start_idx..end_idx 中存在的 dut*.s2p 逐个提取器件参数、RLGC、过渡元件；
-    2. 合并所有 DUT 的过渡结构提参数据 X/Y，监督训练一个共享 NN；
-    3. 使用同一个共享 NN 对所有 DUT 进行预测和级联评估；
-    4. 使用所有 DUT 的 HFSS 整体 S 参数作为共同目标，端到端微调共享 NN；
-    5. 保存关键中间结果，便于后续分析和调用。
-    """
+    鎺ㄨ崘涓诲叆鍙ｏ細浣跨敤澶氫釜涓嶅悓灏哄 DUT 鍏卞悓璁粌涓€涓彲缂╂斁杩囨浮缁撴瀯妯″瀷銆?
+    璁粌娴佺▼锛?    1. 瀵?start_idx..end_idx 涓瓨鍦ㄧ殑 dut*.s2p 閫愪釜鎻愬彇鍣ㄤ欢鍙傛暟銆丷LGC銆佽繃娓″厓浠讹紱
+    2. 鍚堝苟鎵€鏈?DUT 鐨勮繃娓＄粨鏋勬彁鍙傛暟鎹?X/Y锛岀洃鐫ｈ缁冧竴涓叡浜?NN锛?    3. 浣跨敤鍚屼竴涓叡浜?NN 瀵规墍鏈?DUT 杩涜棰勬祴鍜岀骇鑱旇瘎浼帮紱
+    4. 浣跨敤鎵€鏈?DUT 鐨?HFSS 鏁翠綋 S 鍙傛暟浣滀负鍏卞悓鐩爣锛岀鍒扮寰皟鍏变韩 NN锛?    5. 淇濆瓨鍏抽敭涓棿缁撴灉锛屼究浜庡悗缁垎鏋愬拰璋冪敤銆?    """
     base_dir = script_base_dir()
     out_dir_abs = as_abs_path(out_dir, base_dir)
     persist_dir = out_dir_abs if save_intermediate else ""
 
     print("\n" + "=" * 88)
-    print(">>> Step 1/4: 收集多个 DUT，构建可缩放训练数据集")
+    print(">>> Step 1/4: Collect DUT samples and build scalable training data")
     print("=" * 88)
 
     samples = collect_structure_samples(
@@ -366,19 +357,19 @@ def run_dataset_training(
     if save_intermediate:
         save_training_dataset(X_all, Y_all, samples, persist_dir)
 
-    print("\n数据集统计：")
-    print(f"  DUT 数量             : {len(samples)}")
-    print(f"  过渡结构训练样本数   : {X_all.shape[0]}")
-    print(f"  输入维度             : {X_all.shape[1]}")
-    print(f"  输出维度             : {Y_all.shape[1]} ({TRANSITION_VALUE_NAMES})")
+    print("\n鏁版嵁闆嗙粺璁★細")
+    print(f"  DUT 鏁伴噺             : {len(samples)}")
+    print(f"  杩囨浮缁撴瀯璁粌鏍锋湰鏁?  : {X_all.shape[0]}")
+    print(f"  杈撳叆缁村害             : {X_all.shape[1]}")
+    print(f"  杈撳嚭缁村害             : {Y_all.shape[1]} ({TRANSITION_VALUE_NAMES})")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"  使用设备             : {device}")
+    print(f"  浣跨敤璁惧             : {device}")
     if save_intermediate:
-        print(f"  中间结果目录         : {os.path.join(out_dir_abs, 'intermediate')}")
+        print(f"  涓棿缁撴灉鐩綍         : {os.path.join(out_dir_abs, 'intermediate')}")
 
     print("\n" + "=" * 88)
-    print(">>> Step 2/4: 监督训练共享过渡结构 NN")
+    print(">>> Step 2/4: 鐩戠潱璁粌鍏变韩杩囨浮缁撴瀯 NN")
     print("=" * 88)
 
     model, normalizer, supervised_loss_history = train_supervised_transition_nn(
@@ -415,7 +406,7 @@ def run_dataset_training(
         )
 
     print("\n" + "=" * 88)
-    print(">>> Step 3/4: 以所有 DUT 的 HFSS 整体 S 参数为共同目标端到端微调")
+    print(">>> Step 3/4: 浠ユ墍鏈?DUT 鐨?HFSS 鏁翠綋 S 鍙傛暟涓哄叡鍚岀洰鏍囩鍒扮寰皟")
     print("=" * 88)
 
     if fine_epochs > 0:
@@ -431,7 +422,7 @@ def run_dataset_training(
             verbose=verbose,
         )
     else:
-        print("fine_epochs <= 0，跳过端到端微调。")
+        print("fine_epochs <= 0; skipping end-to-end fine-tuning.")
         fine_tune_loss_history = {"epoch": [], "loss": [], "loss_s": [], "loss_reg": []}
 
     model_fine_tuned = copy.deepcopy(model).to(device=device, dtype=torch.float64)
@@ -460,7 +451,7 @@ def run_dataset_training(
         )
 
     print("\n" + "=" * 88)
-    print(">>> Step 4/4: 对每个 DUT 评估并绘图")
+    print(">>> Step 4/4: Evaluate and plot each DUT")
     print("=" * 88)
 
     results: Dict[int, Dict[str, object]] = {}
@@ -490,7 +481,7 @@ def run_dataset_training(
         }
 
         print("\n" + "-" * 88)
-        print(f"dut{sample.idx} 结果：")
+        print(f"dut{sample.idx} results:")
         print_mse_table(sample.hfss_nw, compare_networks)
 
         mse_row = {"idx": float(sample.idx)}
@@ -555,13 +546,12 @@ def run_dataset_training(
 
 def run_one_dut(idx: int, **kwargs) -> Dict[str, object]:
     """
-    单 DUT 调试入口。注意：为了保持模型可缩放，这里也调用数据集训练入口，
-    只是数据集里只有一个 DUT。实际建模建议使用 run_dataset_training。
-    """
+    鍗?DUT 璋冭瘯鍏ュ彛銆傛敞鎰忥細涓轰簡淇濇寔妯″瀷鍙缉鏀撅紝杩欓噷涔熻皟鐢ㄦ暟鎹泦璁粌鍏ュ彛锛?    鍙槸鏁版嵁闆嗛噷鍙湁涓€涓?DUT銆傚疄闄呭缓妯″缓璁娇鐢?run_dataset_training銆?    """
     output = run_dataset_training(start_idx=idx, end_idx=idx, **kwargs)
     return output["results"].get(idx, {})
 
 
 def run_batch(start_idx: int = 1, end_idx: int = 10, **kwargs) -> Dict[str, object]:
-    """兼容旧入口；现在默认执行多 DUT 共享模型训练。"""
+    """Backward-compatible entrypoint for multi-DUT shared model training."""
     return run_dataset_training(start_idx=start_idx, end_idx=end_idx, **kwargs)
+

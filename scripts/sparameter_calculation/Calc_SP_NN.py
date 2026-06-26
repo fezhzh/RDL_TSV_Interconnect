@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 import glob
 import numpy as np
@@ -10,14 +10,14 @@ from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
 
 # ==========================================
-# 1. 物理启发的自建模块：CEL (因果律) & PEL (无源性)
+# 1. 鐗╃悊鍚彂鐨勮嚜寤烘ā鍧楋細CEL (鍥犳灉寰? & PEL (鏃犳簮鎬?
 # ==========================================
 
 class CEL(nn.Module):
     """
-    因果律约束层 (Causality Enforcement Layer)
-    基于 PyTorch FFT 实现 Kramers-Kronig 约束。
-    将 S 参数转入时域，施加因果窗 (消除 t<0 的响应)，再转回频域。
+    鍥犳灉寰嬬害鏉熷眰 (Causality Enforcement Layer)
+    鍩轰簬 PyTorch FFT 瀹炵幇 Kramers-Kronig 绾︽潫銆?
+    灏?S 鍙傛暟杞叆鏃跺煙锛屾柦鍔犲洜鏋滅獥 (娑堥櫎 t<0 鐨勫搷搴?锛屽啀杞洖棰戝煙銆?
     """
     def __init__(self):
         super(CEL, self).__init__()
@@ -25,39 +25,39 @@ class CEL(nn.Module):
     def forward(self, x, freq_points):
         batch_size, channels, N = x.shape
         
-        # 提取复数 S 参数
+        # 鎻愬彇澶嶆暟 S 鍙傛暟
         S11 = torch.complex(x[:, 0, :], x[:, 1, :])
         S21 = torch.complex(x[:, 2, :], x[:, 3, :])
         
         def enforce_causality_fft(S):
-            # 1. 构造共轭对称的完整频谱以进行傅里叶逆变换
-            # 伪造直流(DC)分量，取第一个频点的实部
+            # 1. 鏋勯€犲叡杞绉扮殑瀹屾暣棰戣氨浠ヨ繘琛屽倕閲屽彾閫嗗彉鎹?
+            # 浼€犵洿娴?DC)鍒嗛噺锛屽彇绗竴涓鐐圭殑瀹為儴
             DC = torch.real(S[:, 0:1]).to(S.dtype)
-            # 负频率部分为正频率的共轭倒序
+            # 璐熼鐜囬儴鍒嗕负姝ｉ鐜囩殑鍏辫江鍊掑簭
             S_neg = torch.conj(torch.flip(S[:, :-1], dims=[1]))
-            # 拼接: [DC, 正频率, 负频率] (总长度为 2N)
+            # 鎷兼帴: [DC, 姝ｉ鐜? 璐熼鐜嘳 (鎬婚暱搴︿负 2N)
             S_full = torch.cat([DC, S, S_neg], dim=1)
             
-            # 2. IFFT 到时域
+            # 2. IFFT 鍒版椂鍩?
             h_t = torch.fft.ifft(S_full, dim=1)
             
-            # 3. 施加因果窗 (Causal Window): t=0处为1, t>0处为2, t<0处为0
+            # 3. 鏂藉姞鍥犳灉绐?(Causal Window): t=0澶勪负1, t>0澶勪负2, t<0澶勪负0
             window = torch.zeros_like(h_t, dtype=torch.float32)
             window[:, 0] = 1.0
             window[:, 1:N+1] = 2.0
             
             h_t_causal = h_t * window
             
-            # 4. FFT 回到频域
+            # 4. FFT 鍥炲埌棰戝煙
             S_causal_full = torch.fft.fft(h_t_causal, dim=1)
             
-            # 5. 返回约束后的正频率部分
+            # 5. 杩斿洖绾︽潫鍚庣殑姝ｉ鐜囬儴鍒?
             return S_causal_full[:, 1:N+1]
 
         S11_c = enforce_causality_fft(S11)
         S21_c = enforce_causality_fft(S21)
         
-        # 将复数拆分为实部和虚部
+        # 灏嗗鏁版媶鍒嗕负瀹為儴鍜岃櫄閮?
         out = torch.zeros_like(x)
         out[:, 0, :] = torch.real(S11_c)
         out[:, 1, :] = torch.imag(S11_c)
@@ -68,9 +68,9 @@ class CEL(nn.Module):
 
 class PEL(nn.Module):
     """
-    无源性约束层 (Passivity Enforcement Layer)
-    基于 PyTorch SVD 奇异值分解实现。
-    保证任何频点上的最大奇异值不超过 1。
+    鏃犳簮鎬х害鏉熷眰 (Passivity Enforcement Layer)
+    鍩轰簬 PyTorch SVD 濂囧紓鍊煎垎瑙ｅ疄鐜般€?
+    淇濊瘉浠讳綍棰戠偣涓婄殑鏈€澶у寮傚€间笉瓒呰繃 1銆?
     """
     def __init__(self):
         super(PEL, self).__init__()
@@ -81,19 +81,19 @@ class PEL(nn.Module):
         S11 = torch.complex(x[:, 0, :], x[:, 1, :])
         S21 = torch.complex(x[:, 2, :], x[:, 3, :])
 
-        # 构建互易网络的 2x2 矩阵: [S11, S21 ; S21, S11]
+        # 鏋勫缓浜掓槗缃戠粶鐨?2x2 鐭╅樀: [S11, S21 ; S21, S11]
         S_matrix = torch.stack([S11, S21, S21, S11], dim=1) 
         tensor = S_matrix.permute(0, 2, 1).reshape(batch_size, freq_points, 2, 2)
         
-        # 奇异值分解
+        # 濂囧紓鍊煎垎瑙?
         S_vals = torch.linalg.svdvals(tensor)
         max_val = S_vals.max(dim=-1).values
         
-        # 如果奇异值 > 1，计算缩放比例；否则保持为 1
+        # 濡傛灉濂囧紓鍊?> 1锛岃绠楃缉鏀炬瘮渚嬶紱鍚﹀垯淇濇寔涓?1
         scale = torch.where(max_val > 1.0, 1.0 / max_val, torch.ones_like(max_val))
         scale = scale.reshape(batch_size, 1, freq_points)
 
-        # 施加无源缩放
+        # 鏂藉姞鏃犳簮缂╂斁
         S_pel = S_matrix * scale
         
         out = torch.zeros_like(x)
@@ -105,7 +105,7 @@ class PEL(nn.Module):
 
 
 # ==========================================
-# 2. 神经网络结构定义 (SNN)
+# 2. 绁炵粡缃戠粶缁撴瀯瀹氫箟 (SNN)
 # ==========================================
 class SNN(nn.Module):
     def __init__(self):
@@ -136,7 +136,7 @@ class SNN(nn.Module):
         self.norm_dec11 = nn.BatchNorm1d(30)
         self.tconv5 = nn.ConvTranspose1d(30, 4, 4, 3, 0)
 
-        # 实例化原生约束层
+        # 瀹炰緥鍖栧師鐢熺害鏉熷眰
         self.CEL = CEL()
         self.PEL = PEL()
 
@@ -173,11 +173,11 @@ class SNN(nn.Module):
         if x.shape[-1] != original_length:
             x = F.interpolate(x, size=original_length, mode='linear', align_corners=False)
 
-        # ====== 施加内嵌的物理约束 ======
-        # 1. 因果律
+        # ====== 鏂藉姞鍐呭祵鐨勭墿鐞嗙害鏉?======
+        # 1. 鍥犳灉寰?
         x = self.CEL(x, original_length)
         
-        # 2. 无源性 (训练后期开启)
+        # 2. 鏃犳簮鎬?(璁粌鍚庢湡寮€鍚?
         if current_iter is not None and total_iter is not None:
             if current_iter >= (total_iter * 0.8): 
                 x = self.PEL(x)
@@ -185,7 +185,7 @@ class SNN(nn.Module):
         return x
 
 # ==========================================
-# 3. 数据集构建与清洗
+# 3. 鏁版嵁闆嗘瀯寤轰笌娓呮礂
 # ==========================================
 def extract_4_channels_from_snp(filepath):
     nw = rf.Network(filepath)
@@ -195,7 +195,7 @@ def extract_4_channels_from_snp(filepath):
 def build_dataset(input_dir, target_dir):
     X_list, Y_list = [], []
     input_files = glob.glob(os.path.join(input_dir, "*.s*p"))
-    print(f"\n>>> 正在从 {input_dir} 和 {target_dir} 构建数据集...")
+    print(f"\n>>> 姝ｅ湪浠?{input_dir} 鍜?{target_dir} 鏋勫缓鏁版嵁闆?..")
     
     matched_count = 0
     expected_length = None
@@ -212,10 +212,10 @@ def build_dataset(input_dir, target_dir):
             
             if expected_length is None:
                 expected_length = x_data.shape[1]
-                print(f"   [基准长度] 锁定频点数: {expected_length}")
+                print(f"   [鍩哄噯闀垮害] 閿佸畾棰戠偣鏁? {expected_length}")
             
             if x_data.shape[1] != expected_length or y_data.shape[1] != expected_length:
-                print(f"   [剔除] 频点异常: {filename}")
+                print(f"   [鍓旈櫎] 棰戠偣寮傚父: {filename}")
                 continue
             
             X_list.append(x_data)
@@ -225,7 +225,7 @@ def build_dataset(input_dir, target_dir):
         except Exception as e:
             pass
             
-    print(f">>> 构建完毕！有效样本对: {matched_count}\n")
+    print(f">>> 鏋勫缓瀹屾瘯锛佹湁鏁堟牱鏈: {matched_count}\n")
     return np.array(X_list), np.array(Y_list)
 
 class SParamDataset(Dataset):
@@ -235,7 +235,7 @@ class SParamDataset(Dataset):
     def __getitem__(self, idx): return self.X[idx], self.Y[idx]
 
 # ==========================================
-# 4. 训练控制
+# 4. 璁粌鎺у埗
 # ==========================================
 def train_mapping_network(X_data, Y_data, epochs=150, batch_size=16, lr=0.001):
     num_samples = len(X_data)
@@ -247,7 +247,7 @@ def train_mapping_network(X_data, Y_data, epochs=150, batch_size=16, lr=0.001):
     val_loader   = DataLoader(SParamDataset(X_data[val_idx],   Y_data[val_idx]),   batch_size=batch_size, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f">>> 开始训练，当前硬件: {device}")
+    print(f">>> 寮€濮嬭缁冿紝褰撳墠纭欢: {device}")
     
     model = SNN().to(device)
     criterion = nn.MSELoss()
@@ -264,7 +264,7 @@ def train_mapping_network(X_data, Y_data, epochs=150, batch_size=16, lr=0.001):
             bx, by = bx.to(device), by.to(device)
             optimizer.zero_grad()
             
-            # 前向传播，传入当前 epoch 自动触发后期的 PEL 约束
+            # 鍓嶅悜浼犳挱锛屼紶鍏ュ綋鍓?epoch 鑷姩瑙﹀彂鍚庢湡鐨?PEL 绾︽潫
             pred_y = model(bx, current_iter=epoch, total_iter=epochs)
             loss = criterion(pred_y, by)
             loss.backward()
@@ -294,7 +294,7 @@ def train_mapping_network(X_data, Y_data, epochs=150, batch_size=16, lr=0.001):
             best_val_loss = avg_val_loss
             torch.save(model.state_dict(), "SNN_Cascade_to_HFSS.pth")
 
-    print("\n>>> 训练完美收官！权重已保存至 'SNN_Cascade_to_HFSS.pth'")
+    print("\n>>> 璁粌瀹岀編鏀跺畼锛佹潈閲嶅凡淇濆瓨鑷?'SNN_Cascade_to_HFSS.pth'")
     
     plt.figure(figsize=(8, 5))
     plt.plot(train_loss_hist, label='Train Loss')
@@ -308,7 +308,7 @@ def train_mapping_network(X_data, Y_data, epochs=150, batch_size=16, lr=0.001):
     plt.show()
 
 # ==========================================
-# 5. 训练后画图对比
+# 5. 璁粌鍚庣敾鍥惧姣?
 # ==========================================
 def evaluate_and_plot(model_path, X_data, Y_data, num_plots=2):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -317,9 +317,9 @@ def evaluate_and_plot(model_path, X_data, Y_data, num_plots=2):
     try:
         model.load_state_dict(torch.load(model_path, map_location=device, weights_only=True))
         model.eval()
-        print(f">>> 成功加载权重，开始抽取验证集数据画图对比...")
+        print(f">>> 鎴愬姛鍔犺浇鏉冮噸锛屽紑濮嬫娊鍙栭獙璇侀泦鏁版嵁鐢诲浘瀵规瘮...")
     except Exception as e:
-        print(f"加载模型失败: {e}")
+        print(f"鍔犺浇妯″瀷澶辫触: {e}")
         return
 
     num_samples = len(X_data)
@@ -331,7 +331,7 @@ def evaluate_and_plot(model_path, X_data, Y_data, num_plots=2):
         
         with torch.no_grad():
             x_tensor = torch.tensor(x_sample, dtype=torch.float32).to(device)
-            y_pred_tensor = model(x_tensor, current_iter=100, total_iter=100) # 触发 PEL
+            y_pred_tensor = model(x_tensor, current_iter=100, total_iter=100) # 瑙﹀彂 PEL
             y_pred = y_pred_tensor.cpu().numpy()[0]
 
         def calc_db(real_part, imag_part):
@@ -369,22 +369,22 @@ def evaluate_and_plot(model_path, X_data, Y_data, num_plots=2):
         plt.show()
 
 # ==========================================
-# 6. 统一执行入口
+# 6. 缁熶竴鎵ц鍏ュ彛
 # ==========================================
 if __name__ == "__main__":
     os.chdir(Path(__file__).resolve().parents[2])
     
-    dir_input_X  = r"./data/sparameters/RDL_TSV_NN_Snp"    
-    dir_target_Y = r"./data/sparameters/RDL_TSV_Snp"       
+    dir_input_X  = r"./snp_data/RDL_TSV_NN_Snp"    
+    dir_target_Y = r"./snp_data/RDL_TSV_Snp"       
 
     if not os.path.exists(dir_input_X) or not os.path.exists(dir_target_Y):
-        print("错误：数据文件夹不存在，请检查路径。")
+        print("Error: data folder does not exist, please check paths.")
         exit()
 
     X_data, Y_data = build_dataset(dir_input_X, dir_target_Y)
     
     if len(X_data) < 10:
-        print("警告：提取到的有效数据对太少，网络难以收敛。")
+        print("Warning: too few valid data pairs were extracted; training may not converge.")
         exit()
 
     train_mapping_network(X_data, Y_data, epochs=1000, batch_size=16, lr=0.001)

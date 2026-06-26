@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import numpy as np
 import skrf
 from scipy.interpolate import interp1d
@@ -39,7 +39,7 @@ def ABCD_RLGC(A,B,C,D,freq,l):
     Gamma=np.arccosh((A+D)/2)
     # Gamma=np.arccosh(A)#
     # Gamma=np.arcsinh(np.sqrt(B*C))
-    #########拼Gamma虚部##################
+    #########鎷糋amma铏氶儴##################
     RGamma,IGamma=np.real(Gamma),np.imag(Gamma)
     index=1
     while(index):
@@ -109,9 +109,9 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
     Rdc,Ldc,Gdc,Cdc=R[0],L[0],G[0],C[0]
     Rhf,Lhf,Ghf,Chf=R[p2],L[p2],G[p2],C[p2]
 
-    # 先优化更稳定且可辨识的量，再反算回原电路元件：
-    # Rlow = R1 || R2，dR = R1 - Rlow，tau2 = L2/(R1+R2)，tau3 = L3/R3。
-    # 固定 R3/(R1+R3)，避免 R1 和 R3 对同一个高频电阻贡献产生多组等价分配。
+    # 鍏堜紭鍖栨洿绋冲畾涓斿彲杈ㄨ瘑鐨勯噺锛屽啀鍙嶇畻鍥炲師鐢佃矾鍏冧欢锛?
+    # Rlow = R1 || R2锛宒R = R1 - Rlow锛宼au2 = L2/(R1+R2)锛宼au3 = L3/R3銆?
+    # 鍥哄畾 R3/(R1+R3)锛岄伩鍏?R1 鍜?R3 瀵瑰悓涓€涓珮棰戠數闃昏础鐚骇鐢熷缁勭瓑浠峰垎閰嶃€?
     Rlow=abs(Rdc)
     R1=max((1-r3_ratio_fixed)*abs(Rhf), Rlow*1.2)
     R3=R1*r3_ratio_fixed/(1-r3_ratio_fixed)
@@ -190,7 +190,7 @@ def RLGC_SPICE_rlgc_way3(R,L,G,C,l,freq,p1=None,p2=None):
         parameter_spice[kk]=values[kk]
 
 
-    #计算得到S参数
+    #璁＄畻寰楀埌S鍙傛暟
     R_all,L_all,G_all,C_all=[],[],[],[]
     S11_all,S12_all,S21_all,S22_all=[],[],[],[]
     Sps=[]
@@ -237,49 +237,49 @@ def find_resonation_frequency(Y11):
 
 
 
-#######主函数部分##########################
+#######涓诲嚱鏁伴儴鍒?#########################
 if __name__ == '__main__':
 
-    os.chdir(Path(__file__).resolve().parents[2])  # 切换到脚本所在目录（可选）
+    os.chdir(Path(__file__).resolve().parents[2])  # 鍒囨崲鍒拌剼鏈墍鍦ㄧ洰褰曪紙鍙€夛級
     # output_csv_path = r"D:\MLIN\SNP\output_variables_real_0628.csv"
-        #输入1-150Ghz长度为L的EM数据，长度为100um的EM数据,L的长度
-    # 初始化 CSV 数据存储列表
+        #杈撳叆1-150Ghz闀垮害涓篖鐨凟M鏁版嵁锛岄暱搴︿负100um鐨凟M鏁版嵁,L鐨勯暱搴?
+    # 鍒濆鍖?CSV 鏁版嵁瀛樺偍鍒楄〃
     csv_data = []
 
-    # 处理多个文件 dut0.s4p 到 dut3000.s4p
+    # 澶勭悊澶氫釜鏂囦欢 dut0.s4p 鍒?dut3000.s4p
     for i in range(0, 300, 1):  
-        momentum_path = fr"./data/sparameters/RDL_Bottom_Snp/dut{i}.s2p"  # 请确保路径与您实际存放的路径一致
+        momentum_path = fr"./snp_data/RDL_Bottom_Snp/dut{i}.s2p"  # 璇风‘淇濊矾寰勪笌鎮ㄥ疄闄呭瓨鏀剧殑璺緞涓€鑷?
         
         if not os.path.exists(momentum_path):  
-            print(f"文件 {momentum_path} 不存在，跳过")
+            print(f"鏂囦欢 {momentum_path} 涓嶅瓨鍦紝璺宠繃")
             continue
     
         variables = {}
     
-        # 1. 动态读取并解析 s2p 头部注释中的变量
+        # 1. 鍔ㄦ€佽鍙栧苟瑙ｆ瀽 s2p 澶撮儴娉ㄩ噴涓殑鍙橀噺
         with open(momentum_path, 'r') as file:
             for line in file:
                 line = line.strip()
                 
-                # 遇到 "#" 说明注释块结束，进入了 S 参数数据区，直接跳出循环节省算力
+                # 閬囧埌 "#" 璇存槑娉ㄩ噴鍧楃粨鏉燂紝杩涘叆浜?S 鍙傛暟鏁版嵁鍖猴紝鐩存帴璺冲嚭寰幆鑺傜渷绠楀姏
                 if line.startswith('#'):
                     break
                     
                 if line.startswith('!'):  
-                    line = line[1:].strip()  # 去掉 "!"
+                    line = line[1:].strip()  # 鍘绘帀 "!"
                     if '=' in line:
                         var_name, rest = line.split('=', 1)
                         var_name = var_name.strip()
                         rest = rest.strip()
                         
-                        # 正则匹配提取浮点数
+                        # 姝ｅ垯鍖归厤鎻愬彇娴偣鏁?
                         match = re.search(r'([-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?)', rest)
                         if match:
                             value = float(match.group(1))
                             variables[var_name] = value
         
-        # 2. 根据 RDL_top 的变量名获取具体数值
-        # 提取出来的数值默认不带单位（比如 "100um" 提取出来是浮点数 100.0）
+        # 2. 鏍规嵁 RDL_top 鐨勫彉閲忓悕鑾峰彇鍏蜂綋鏁板€?
+        # 鎻愬彇鍑烘潵鐨勬暟鍊奸粯璁や笉甯﹀崟浣嶏紙姣斿 "100um" 鎻愬彇鍑烘潵鏄诞鐐规暟 100.0锛?
 
         l_rdl = variables.get('ldown')
         w_rdl = variables.get('wdown')
@@ -317,7 +317,7 @@ if __name__ == '__main__':
  
 
 
-        # # 绘图
+        # # 缁樺浘
         # plot_RLGC(RLGCs=RLGCs, freqs=freqs, names=["Simulated","Fitting"])
         # plot_2ports_S(Sparameters=sps, names=["Simulated","Fitting"],type="RI",freqs=freqs)        
         # plot_2ports_S(Sparameters=sps, names=["Simulated","Fitting"],type="MP",freqs=freqs)        
@@ -325,13 +325,14 @@ if __name__ == '__main__':
         # plt.show()
         
 
-        # 导出提取得到的参数
-        output_csv_path = r"./data/tables/RDL_Bottom_TD_3.csv" 
+        # 瀵煎嚭鎻愬彇寰楀埌鐨勫弬鏁?
+        output_csv_path = r"./training_datasets/RDL_Bottom_TD_3.csv" 
         csv_row = [l_rdl, w_rdl, t_rdl, h_tsv, p_rdl]+list(parameter_spice)+[rmse]
         csv_data.append(csv_row)
         csv_headers = ["l_rdl", "w_rdl", "t_rdl", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
         # csv_headers = ["d_tsv", "h_tsv", "p_rdl", "R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi",  "Rsi","rmse"]
         df = pd.DataFrame(csv_data, columns=csv_headers)
         df.to_csv(output_csv_path, index=False)
-        print(f"dut{i}参数保存到：{output_csv_path}")
+        print(f"dut{i}鍙傛暟淇濆瓨鍒帮細{output_csv_path}")
+
 

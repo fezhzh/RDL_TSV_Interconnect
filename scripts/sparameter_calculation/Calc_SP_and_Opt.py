@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 import re
 import numpy as np
@@ -9,16 +9,16 @@ import glob
 from scipy.optimize import least_squares
 
 # ==========================================
-# 1. 基础矩阵转换工具
+# 1. 鍩虹鐭╅樀杞崲宸ュ叿
 # ==========================================
 def s2abcd(S, Z0=50.0):
-    """ 将 S 参数 (N, 2, 2) 转换为 ABCD 参数 (N, 2, 2) """
+    """ 灏?S 鍙傛暟 (N, 2, 2) 杞崲涓?ABCD 鍙傛暟 (N, 2, 2) """
     S11 = S[:, 0, 0]
     S12 = S[:, 0, 1]
     S21 = S[:, 1, 0]
     S22 = S[:, 1, 1]
     
-    denom = 2 * S21 + 1e-15 # 加极小值防止除以0
+    denom = 2 * S21 + 1e-15 # 鍔犳瀬灏忓€奸槻姝㈤櫎浠?
     
     A = ((1 + S11) * (1 - S22) + S12 * S21) / denom
     B = Z0 * ((1 + S11) * (1 + S22) - S12 * S21) / denom
@@ -33,7 +33,7 @@ def s2abcd(S, Z0=50.0):
     return ABCD
 
 def abcd2s(ABCD, Z0=50.0):
-    """ 将 ABCD 参数 (N, 2, 2) 转换为 S 参数 (N, 2, 2) """
+    """ 灏?ABCD 鍙傛暟 (N, 2, 2) 杞崲涓?S 鍙傛暟 (N, 2, 2) """
     A = ABCD[:, 0, 0]
     B = ABCD[:, 0, 1]
     C_mat = ABCD[:, 1, 0]
@@ -53,7 +53,7 @@ def abcd2s(ABCD, Z0=50.0):
     return S
 
 # ==========================================
-# 2. 从 s2p 文件中读取器件物理参数
+# 2. 浠?s2p 鏂囦欢涓鍙栧櫒浠剁墿鐞嗗弬鏁?
 # ==========================================
 def extract_device_params_RDL_Top(filepath):
     params = {}
@@ -73,7 +73,7 @@ def extract_device_params_RDL_Top(filepath):
         htsv, p1 = params['htsv'], params['p1']
         return np.array([length, width, thickness, htsv, p1]), length
     except KeyError as e:
-        raise ValueError(f"S2P 文件缺少必要的参数注释: {e}")
+        raise ValueError(f"S2P 鏂囦欢缂哄皯蹇呰鐨勫弬鏁版敞閲? {e}")
 
 def extract_device_params_RDL_Bottom(filepath):
     params = {}
@@ -93,7 +93,7 @@ def extract_device_params_RDL_Bottom(filepath):
         htsv, p1 = params['htsv'], params['p1']
         return np.array([length, width, thickness, htsv, p1]), length
     except KeyError as e:
-        raise ValueError(f"S2P 文件缺少必要的参数注释: {e}")
+        raise ValueError(f"S2P 鏂囦欢缂哄皯蹇呰鐨勫弬鏁版敞閲? {e}")
 
 def extract_device_params_TSV(filepath):
     params = {}
@@ -112,7 +112,7 @@ def extract_device_params_TSV(filepath):
         dtsv, length, p1 = params.get('dtsv'), params.get('htsv'), params['p1']
         return np.array([dtsv, length, p1]), length
     except KeyError as e:
-        raise ValueError(f"S2P 文件缺少必要的参数注释: {e}")
+        raise ValueError(f"S2P 鏂囦欢缂哄皯蹇呰鐨勫弬鏁版敞閲? {e}")
 
 def extract_device_params_RDL_TSV(filepath):
     params = {}
@@ -130,7 +130,7 @@ def extract_device_params_RDL_TSV(filepath):
     return params
 
 # ==========================================
-# 3. 神经网络推理
+# 3. 绁炵粡缃戠粶鎺ㄧ悊
 # ==========================================
 def predict_circuit_parameters(features, mat_dir, param_names, prefix="RDL_Bottom_"):
     circuit_params = {}
@@ -191,7 +191,7 @@ def calculate_S_parameters(circuit_params, length_um, freqs):
     return S_matrices
 
 # ==========================================
-# 4. 【修改】可视化对比 (加入直接级联网络)
+# 4. 銆愪慨鏀广€戝彲瑙嗗寲瀵规瘮 (鍔犲叆鐩存帴绾ц仈缃戠粶)
 # ==========================================
 def Plot_S_Comparison(hfss_nw, nn_nw, direct_nw, title_suffix=""):
     plt.figure(figsize=(12, 5))
@@ -215,17 +215,17 @@ def Plot_S_Comparison(hfss_nw, nn_nw, direct_nw, title_suffix=""):
     
     mse_direct = np.mean(np.abs(hfss_nw.s - direct_nw.s)**2)
     mse_opt = np.mean(np.abs(hfss_nw.s - nn_nw.s)**2)
-    print(f"\n>>> 直接级联 S 矩阵均方误差 (MSE): {mse_direct:.4e}")
-    print(f">>> 优化修正 S 矩阵均方误差 (MSE): {mse_opt:.4e}")
-    print(f">>> 误差降低了: {(mse_direct - mse_opt)/mse_direct * 100:.2f} %")
+    print(f"\n>>> 鐩存帴绾ц仈 S 鐭╅樀鍧囨柟璇樊 (MSE): {mse_direct:.4e}")
+    print(f">>> 浼樺寲淇 S 鐭╅樀鍧囨柟璇樊 (MSE): {mse_opt:.4e}")
+    print(f">>> 璇樊闄嶄綆浜? {(mse_direct - mse_opt)/mse_direct * 100:.2f} %")
 
 # ==========================================
-# 5. ABCD 修正网络计算
+# 5. ABCD 淇缃戠粶璁＄畻
 # ==========================================
 def get_correction_abcd(p, omega):
     """
     p: [Cn1_scale, Rn1_scale, Cn2_scale, Rn2_scale, Cn3_scale, Rn3_scale, Ln1_scale]
-    利用缩放因子保证优化器在 0.1~1000 间正常工作，不报错
+    鍒╃敤缂╂斁鍥犲瓙淇濊瘉浼樺寲鍣ㄥ湪 0.1~1000 闂存甯稿伐浣滐紝涓嶆姤閿?
     """
     Cn1 = p[0] * 1e-14
     Rn1 = p[1] * 1e3
@@ -253,25 +253,25 @@ def get_correction_abcd(p, omega):
     return ABCD
 
 # ==========================================
-# 6. 级联计算与联合参数优化核心函数
+# 6. 绾ц仈璁＄畻涓庤仈鍚堝弬鏁颁紭鍖栨牳蹇冨嚱鏁?
 # ==========================================
 def Calc_Cascaded_RDL_TSV_S(idx):
     os.chdir(Path(__file__).resolve().parents[2]) 
     
-    s2p_file = rf"./data/sparameters/RDL_TSV_Snp/dut{idx}.s2p"         
-    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                   
+    s2p_file = rf"./snp_data/RDL_TSV_Snp/dut{idx}.s2p"         
+    mat_dir  = r"./device_models/RDL_TSV_mat2"                   
     
     if not os.path.exists(s2p_file):
-        print(f"未找到测试文件: {s2p_file}")
+        print(f"鏈壘鍒版祴璇曟枃浠? {s2p_file}")
         return
 
-    print(f"\n>>> 开始处理 {s2p_file} 的参数优化...")
+    print(f"\n>>> 寮€濮嬪鐞?{s2p_file} 鐨勫弬鏁颁紭鍖?..")
     Cascaded_HFSS_NW = rf.Network(s2p_file)
     freqs = Cascaded_HFSS_NW.f          
     omega = 2 * np.pi * freqs
     target_s = Cascaded_HFSS_NW.s
     
-    # 提取物理参数
+    # 鎻愬彇鐗╃悊鍙傛暟
     params = extract_device_params_RDL_TSV(s2p_file)
     
     features_top = np.array([params['lrdl'], params['wrdl'], params['trdl'], params['htsv'], params['p1']])
@@ -279,7 +279,7 @@ def Calc_Cascaded_RDL_TSV_S(idx):
     features_tsv = np.array([params['dtsv'], params['htsv'], params['p1']])
     target_params = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
     
-    # 预测基础的单体组件参数，并转换为 S 和 ABCD 参数
+    # 棰勬祴鍩虹鐨勫崟浣撶粍浠跺弬鏁帮紝骞惰浆鎹负 S 鍜?ABCD 鍙傛暟
     cp_top = predict_circuit_parameters(features_top, mat_dir, target_params, prefix="RDL_Top_")
     s_top = calculate_S_parameters(cp_top, params['lrdl'], freqs)
     abcd_top = s2abcd(s_top)
@@ -292,17 +292,17 @@ def Calc_Cascaded_RDL_TSV_S(idx):
     s_tsv = calculate_S_parameters(cp_tsv, params['htsv'], freqs)
     abcd_tsv = s2abcd(s_tsv)
     
-    # 定义 9 个模块的排列顺序
+    # 瀹氫箟 9 涓ā鍧楃殑鎺掑垪椤哄簭
     base_abcds = [abcd_top, abcd_tsv, abcd_bot, abcd_tsv, abcd_top, abcd_tsv, abcd_bot, abcd_tsv, abcd_top]
 
-    # --- 【新增】计算纯直接级联的结果 ---
+    # --- 銆愭柊澧炪€戣绠楃函鐩存帴绾ц仈鐨勭粨鏋?---
     direct_abcd = base_abcds[0]
     for i in range(1, 9):
         direct_abcd = np.matmul(direct_abcd, base_abcds[i])
     direct_s = abcd2s(direct_abcd)
     nw_cascade_direct = rf.Network(frequency=Cascaded_HFSS_NW.frequency, s=direct_s, name="Direct_Cascade")
     
-    # --- 修正网络参数优化 ---
+    # --- 淇缃戠粶鍙傛暟浼樺寲 ---
     def objective(p_all):
         res = base_abcds[0]
         for i in range(8):
@@ -321,12 +321,12 @@ def Calc_Cascaded_RDL_TSV_S(idx):
     p0 = np.tile(p_init, 8) 
     bounds = (-1e5, 1e5) 
     
-    print(">>> 正在优化 8 个修正网络共 56 个拓扑参数...")
+    print(">>> 姝ｅ湪浼樺寲 8 涓慨姝ｇ綉缁滃叡 56 涓嫇鎵戝弬鏁?..")
     res_opt = least_squares(objective, p0, bounds=bounds, max_nfev=300)
     
-    print(">>> 优化完成！开始计算最终结果...")
+    print(">>> 浼樺寲瀹屾垚锛佸紑濮嬭绠楁渶缁堢粨鏋?..")
     
-    # 提取拟合参数计算优化后结果
+    # 鎻愬彇鎷熷悎鍙傛暟璁＄畻浼樺寲鍚庣粨鏋?
     opt_abcd = base_abcds[0]
     for i in range(8):
         p_i = res_opt.x[i*7 : (i+1)*7]
@@ -339,7 +339,7 @@ def Calc_Cascaded_RDL_TSV_S(idx):
     nw_cascade_opt = rf.Network(frequency=Cascaded_HFSS_NW.frequency, s=opt_s, name="Optimized_NN_Correction")
     Cascaded_HFSS_NW.name = "RDL_TSV_HFSS_Simulated"
 
-    # 将 3 个 Network 传给画图函数
+    # 灏?3 涓?Network 浼犵粰鐢诲浘鍑芥暟
     Plot_S_Comparison(Cascaded_HFSS_NW, nw_cascade_opt, nw_cascade_direct, title_suffix=f"(dut{idx}.s2p)")
 
 if __name__ == "__main__":

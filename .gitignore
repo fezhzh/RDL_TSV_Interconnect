@@ -12,8 +12,7 @@ archive/
 *.pt
 
 # Generated experiment outputs
-outputs/
-models/
+model_results/
 *.png
 
 # Editor/OS noise

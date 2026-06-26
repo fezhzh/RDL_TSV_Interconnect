@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import json
 import re
 import sys
@@ -285,7 +285,7 @@ def load_s2p_files(hfss_dir, case_keys, limit):
     return s2p_files
 
 
-def write_aggregate_outputs(summary_df, out_dir, model_names):
+def write_aggregate_outputs(summary_df, out_dir, model_names, output_prefix="rdl_bottom"):
     aggregate_rows = []
     metric_cols = [
         col
@@ -304,7 +304,7 @@ def write_aggregate_outputs(summary_df, out_dir, model_names):
             }
         )
 
-    aggregate_csv = out_dir / "rdl_bottom_model_compare_aggregate.csv"
+    aggregate_csv = out_dir / f"{output_prefix}_model_compare_aggregate.csv"
     pd.DataFrame(aggregate_rows).to_csv(aggregate_csv, index=False)
 
     compact_rows = []
@@ -322,7 +322,7 @@ def write_aggregate_outputs(summary_df, out_dir, model_names):
             }
         )
     compact_df = pd.DataFrame(compact_rows).sort_values("mean_complex_mse")
-    compact_csv = out_dir / "rdl_bottom_model_compare_compact.csv"
+    compact_csv = out_dir / f"{output_prefix}_model_compare_compact.csv"
     compact_df.to_csv(compact_csv, index=False)
     return aggregate_csv, compact_csv, compact_df
 
@@ -379,7 +379,7 @@ def compare_models(args, model_configs, reference_model=None):
                     plots_dir / f"{s2p_file.stem}_comparison.png",
                     nw_hfss,
                     pred_by_model,
-                    f"{s2p_file.name} RDL_Bottom model comparison",
+                    f"{s2p_file.name} {args.device_name} model comparison",
                 )
             if idx % args.progress_every == 0:
                 print(f"Processed {idx}/{len(s2p_files)}: {s2p_file.name}")
@@ -388,11 +388,11 @@ def compare_models(args, model_configs, reference_model=None):
             print(f"[skip] {s2p_file.name}: {exc}")
 
     summary_df = pd.DataFrame(rows)
-    summary_csv = out_dir / "rdl_bottom_model_compare_summary.csv"
+    summary_csv = out_dir / f"{args.output_prefix}_model_compare_summary.csv"
     summary_df.to_csv(summary_csv, index=False)
 
     valid = summary_df[summary_df.get("error").isna()] if "error" in summary_df else summary_df
-    aggregate_csv, compact_csv, compact_df = write_aggregate_outputs(valid, out_dir, model_names)
+    aggregate_csv, compact_csv, compact_df = write_aggregate_outputs(valid, out_dir, model_names, args.output_prefix)
 
     if not args.no_plots and len(valid):
         save_model_summary_plots(out_dir, valid.reset_index(drop=True), model_names)
@@ -438,10 +438,12 @@ def build_arg_parser():
         description="Compare RDL_Bottom MATLAB .mat models and PyTorch .pt models against HFSS s2p files."
     )
     parser.add_argument("--base-dir", default=None)
-    parser.add_argument("--hfss-dir", default="data/sparameters/RDL_Bottom_Snp")
+    parser.add_argument("--hfss-dir", default="snp_data/RDL_Bottom_Snp")
     parser.add_argument("--case-csv", default="", help="Optional CSV used to filter geometry cases.")
-    parser.add_argument("--out-dir", default="outputs/comparison/RDL_Bottom_model_compare")
-    parser.add_argument("--length-param", choices=["htsv", "ldown"], default="ldown")
+    parser.add_argument("--out-dir", default="model_results/comparison/RDL_Bottom_model_compare")
+    parser.add_argument("--length-param", choices=["htsv", "ldown", "lrdl"], default="ldown")
+    parser.add_argument("--device-name", default="RDL_Bottom")
+    parser.add_argument("--output-prefix", default="rdl_bottom")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--no-plots", action="store_true")
     parser.add_argument("--plot-all", action="store_true")
@@ -455,14 +457,14 @@ def main():
 
     # Define all models to compare here.
     model_configs = [
-        {"label": "mat1", "type": "matlab", "path": "data/matlab_models/RDL_TSV_mat1"},
-        {"label": "mat2", "type": "matlab", "path": "data/matlab_models/RDL_TSV_mat2"},
-        {"label": "mat3", "type": "matlab", "path": "data/matlab_models/RDL_TSV_mat3"},
-        {"label": "mat4", "type": "matlab", "path": "data/matlab_models/RDL_TSV_mat4"},
+        {"label": "mat1", "type": "matlab", "path": "device_models/RDL_TSV_mat1"},
+        {"label": "mat2", "type": "matlab", "path": "device_models/RDL_TSV_mat2"},
+        {"label": "mat3", "type": "matlab", "path": "device_models/RDL_TSV_mat3"},
+        {"label": "mat4", "type": "matlab", "path": "device_models/RDL_TSV_mat4"},
         {
             "label": "new_s_finetuned",
             "type": "torch",
-            "path": "outputs/training/RDL_Bottom_TD4_trend_sparam_training",
+            "path": "model_results/training/RDL_Bottom_TD4_trend_sparam_training",
             "filename": "rdl_bottom_param_net.pt",
         },
     ]
@@ -472,3 +474,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

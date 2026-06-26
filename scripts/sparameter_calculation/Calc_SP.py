@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 import re
 import numpy as np
@@ -8,12 +8,12 @@ import matplotlib.pyplot as plt
 import glob
 
 # ==========================================
-# 1. 从 s2p 文件中读取器件物理参数
+# 1. 浠?s2p 鏂囦欢涓鍙栧櫒浠剁墿鐞嗗弬鏁?
 # ==========================================
 def extract_device_params_RDL_Top(filepath):
     """
-    解析 .s2p 文件头部的注释，提取器件物理参数 (作为 NN 的输入 x)
-    兼容 RDL_top (lrdl) 和 RDL_bottom (ldown)
+    瑙ｆ瀽 .s2p 鏂囦欢澶撮儴鐨勬敞閲婏紝鎻愬彇鍣ㄤ欢鐗╃悊鍙傛暟 (浣滀负 NN 鐨勮緭鍏?x)
+    鍏煎 RDL_top (lrdl) 鍜?RDL_bottom (ldown)
     """
     params = {}
     with open(filepath, 'r') as f:
@@ -29,7 +29,7 @@ def extract_device_params_RDL_Top(filepath):
                     if match:
                         params[key.strip()] = float(match.group(1))
                         
-    # 动态适配 lrdl(Top) 或 ldown(Bottom)
+    # 鍔ㄦ€侀€傞厤 lrdl(Top) 鎴?ldown(Bottom)
     try:
         length = params.get('lrdl')
         width = params.get('wrdl')
@@ -40,13 +40,13 @@ def extract_device_params_RDL_Top(filepath):
         features = np.array([length, width, thickness, htsv, p1])
         return features, length
     except KeyError as e:
-        raise ValueError(f"S2P 文件缺少必要的参数注释: {e}")
+        raise ValueError(f"S2P 鏂囦欢缂哄皯蹇呰鐨勫弬鏁版敞閲? {e}")
     
 
 def extract_device_params_RDL_Bottom(filepath):
     """
-    解析 .s2p 文件头部的注释，提取器件物理参数 (作为 NN 的输入 x)
-    兼容 RDL_top (lrdl) 和 RDL_bottom (ldown)
+    瑙ｆ瀽 .s2p 鏂囦欢澶撮儴鐨勬敞閲婏紝鎻愬彇鍣ㄤ欢鐗╃悊鍙傛暟 (浣滀负 NN 鐨勮緭鍏?x)
+    鍏煎 RDL_top (lrdl) 鍜?RDL_bottom (ldown)
     """
     params = {}
     with open(filepath, 'r') as f:
@@ -62,7 +62,7 @@ def extract_device_params_RDL_Bottom(filepath):
                     if match:
                         params[key.strip()] = float(match.group(1))
                         
-    # 动态适配 lrdl(Top) 或 ldown(Bottom)
+    # 鍔ㄦ€侀€傞厤 lrdl(Top) 鎴?ldown(Bottom)
     try:
         length = params.get('ldown')
         width = params.get('wdown')
@@ -73,12 +73,12 @@ def extract_device_params_RDL_Bottom(filepath):
         features = np.array([length, width, thickness, htsv, p1])
         return features, length
     except KeyError as e:
-        raise ValueError(f"S2P 文件缺少必要的参数注释: {e}")
+        raise ValueError(f"S2P 鏂囦欢缂哄皯蹇呰鐨勫弬鏁版敞閲? {e}")
 
 def extract_device_params_TSV(filepath):
     """
-    解析 .s2p 文件头部的注释，提取器件物理参数 (作为 NN 的输入 x)
-    兼容 RDL_top (lrdl) 和 RDL_bottom (ldown)
+    瑙ｆ瀽 .s2p 鏂囦欢澶撮儴鐨勬敞閲婏紝鎻愬彇鍣ㄤ欢鐗╃悊鍙傛暟 (浣滀负 NN 鐨勮緭鍏?x)
+    鍏煎 RDL_top (lrdl) 鍜?RDL_bottom (ldown)
     """
     params = {}
     with open(filepath, 'r') as f:
@@ -94,7 +94,7 @@ def extract_device_params_TSV(filepath):
                     if match:
                         params[key.strip()] = float(match.group(1))
                         
-    # 动态适配 lrdl(Top) 或 ldown(Bottom)
+    # 鍔ㄦ€侀€傞厤 lrdl(Top) 鎴?ldown(Bottom)
     try:
         dtsv = params.get('dtsv')
         length = params.get('htsv')
@@ -103,13 +103,13 @@ def extract_device_params_TSV(filepath):
         features = np.array([dtsv,length,p1])
         return features, length
     except KeyError as e:
-        raise ValueError(f"S2P 文件缺少必要的参数注释: {e}")
+        raise ValueError(f"S2P 鏂囦欢缂哄皯蹇呰鐨勫弬鏁版敞閲? {e}")
     
 
 def extract_device_params_RDL_TSV(filepath):
     """
-    解析 ./RDL_TSV/dut{idx}.s2p 整体链路文件头部的注释。
-    提取出包含 Top、Bottom 和 TSV 的所有物理参数。
+    瑙ｆ瀽 ./RDL_TSV/dut{idx}.s2p 鏁翠綋閾捐矾鏂囦欢澶撮儴鐨勬敞閲娿€?
+    鎻愬彇鍑哄寘鍚?Top銆丅ottom 鍜?TSV 鐨勬墍鏈夌墿鐞嗗弬鏁般€?
     """
     params = {}
     with open(filepath, 'r') as f:
@@ -127,11 +127,11 @@ def extract_device_params_RDL_TSV(filepath):
     return params
 
 # ==========================================
-# 2. 神经网络推理 (循环加载 9 个 .mat 文件)
+# 2. 绁炵粡缃戠粶鎺ㄧ悊 (寰幆鍔犺浇 9 涓?.mat 鏂囦欢)
 # ==========================================
 def predict_circuit_parameters(features, mat_dir, param_names, prefix="RDL_Bottom_"):
     """
-    读取 MATLAB 导出的权值，预测出 9 个等效电路缩放参数 (nH, pF, Ohm)
+    璇诲彇 MATLAB 瀵煎嚭鐨勬潈鍊硷紝棰勬祴鍑?9 涓瓑鏁堢數璺缉鏀惧弬鏁?(nH, pF, Ohm)
     """
     circuit_params = {}
     x = features.reshape(1, -1)
@@ -140,7 +140,7 @@ def predict_circuit_parameters(features, mat_dir, param_names, prefix="RDL_Botto
         mat_filepath = os.path.join(mat_dir, f"{prefix}{param}.mat")
         
         if not os.path.exists(mat_filepath):
-            print(f"警告：未找到模型文件 {mat_filepath}，分配安全默认值。")
+            print(f"Warning: model file not found: {mat_filepath}; using safe default.")
             circuit_params[param] = 1.0 
             continue
             
@@ -154,30 +154,30 @@ def predict_circuit_parameters(features, mat_dir, param_names, prefix="RDL_Botto
         w2, b2 = mat_data['w2'], mat_data['theta2']
         w3, b3 = mat_data['w3'], mat_data['theta3']
         
-        # 归一化 [-1, 1]
+        # 褰掍竴鍖?[-1, 1]
         x_norm = 2.0 * (x - xmin) / (xmax - xmin + 1e-12) - 1.0
         
-        # 前向传播 (双隐藏层 tansig -> purelin)
+        # 鍓嶅悜浼犳挱 (鍙岄殣钘忓眰 tansig -> purelin)
         a1 = np.tanh(np.dot(x_norm, w1) + b1)
         a2 = np.tanh(np.dot(a1, w2) + b2)
         y_norm = np.dot(a2, w3) + b3
         
-        # 反归一化
+        # 鍙嶅綊涓€鍖?
         y_real = ymin + (y_norm + 1.0) * (ymax - ymin) / 2.0
         circuit_params[param] = float(y_real.flatten()[0])
         
     return circuit_params
 
 # ==========================================
-# 3. RLGC -> 计算 S 参数 (完美对齐您的频变数学模型)
+# 3. RLGC -> 璁＄畻 S 鍙傛暟 (瀹岀編瀵归綈鎮ㄧ殑棰戝彉鏁板妯″瀷)
 # ==========================================
 def calculate_S_parameters(circuit_params, length_um, freqs):
     """
-    1. 反缩放网络输出的 nH 和 pF 参数到标准单位 (H, F)。
-    2. 计算随频率变化的单位长度分布参数 (R_RLGC, L_RLGC, G_RLGC, C_RLGC)。
-    3. 根据长度转化为 ABCD 矩阵并提取 S 矩阵。
+    1. 鍙嶇缉鏀剧綉缁滆緭鍑虹殑 nH 鍜?pF 鍙傛暟鍒版爣鍑嗗崟浣?(H, F)銆?
+    2. 璁＄畻闅忛鐜囧彉鍖栫殑鍗曚綅闀垮害鍒嗗竷鍙傛暟 (R_RLGC, L_RLGC, G_RLGC, C_RLGC)銆?
+    3. 鏍规嵁闀垮害杞寲涓?ABCD 鐭╅樀骞舵彁鍙?S 鐭╅樀銆?
     """
-    # 提取并逆缩放网络参数：L 恢复为 H (乘 1e-9)，C 恢复为 F (乘 1e-12)
+    # 鎻愬彇骞堕€嗙缉鏀剧綉缁滃弬鏁帮細L 鎭㈠涓?H (涔?1e-9)锛孋 鎭㈠涓?F (涔?1e-12)
     R1 = circuit_params["R1"]
     R2 = circuit_params["R2"]
     R3 = circuit_params["R3"]
@@ -188,37 +188,37 @@ def calculate_S_parameters(circuit_params, length_um, freqs):
     Csi = circuit_params["Csi"] * 1e-12
     Rsi = circuit_params["Rsi"]
     
-    # 物理长度转换 (um -> m)
+    # 鐗╃悊闀垮害杞崲 (um -> m)
     length_m = length_um * 1e-6 
     omega = 2 * np.pi * freqs
     
-    # === 使用 NumPy 向量化操作加速频变公式计算 (与提参2.py完全一致) ===
-    # 串联阻抗支路 (趋肤与涡流)
+    # === 浣跨敤 NumPy 鍚戦噺鍖栨搷浣滃姞閫熼鍙樺叕寮忚绠?(涓庢彁鍙?.py瀹屽叏涓€鑷? ===
+    # 涓茶仈闃绘姉鏀矾 (瓒嬭偆涓庢丁娴?
     R_RLGC = (R1**2 * R2 + R1 * R2**2 + omega**2 * R1 * L2**2) / ((R1 + R2)**2 + omega**2 * L2**2) + (omega**2 * L3**2 * R3) / (R3**2 + omega**2 * L3**2)
     L_RLGC = (R1**2 * L2) / ((R1 + R2)**2 + omega**2 * L2**2) + L3 * R3**2 / (R3**2 + omega**2 * L3**2) + L1
     
-    # 并联导纳支路 (硅衬底色散)
+    # 骞惰仈瀵肩撼鏀矾 (纭呰‖搴曡壊鏁?
     G_RLGC = (omega**2 * Rsi * Cox**2) / (1 + omega**2 * Rsi**2 * (Cox + Csi)**2)
     C_RLGC = (Cox + omega**2 * Csi * Rsi**2 * Cox * (Cox + Csi)) / (1 + omega**2 * Rsi**2 * (Cox + Csi)**2)
 
-    # 计算特征阻抗与传播常数
+    # 璁＄畻鐗瑰緛闃绘姉涓庝紶鎾父鏁?
     Z0 = np.sqrt((R_RLGC + 1j * omega * L_RLGC) / (G_RLGC + 1j * omega * C_RLGC))
     GAMMA = np.sqrt((R_RLGC + 1j * omega * L_RLGC) * (G_RLGC + 1j * omega * C_RLGC))
 
-    # 传输线的 ABCD 参数
+    # 浼犺緭绾跨殑 ABCD 鍙傛暟
     A = np.cosh(GAMMA * length_m)
     B = Z0 * np.sinh(GAMMA * length_m)
     C_mat = (1 / Z0) * np.sinh(GAMMA * length_m)
     D = np.cosh(GAMMA * length_m)
     
-    # ABCD 转 S 参数公式
+    # ABCD 杞?S 鍙傛暟鍏紡
     denom = A + B/50.0 + C_mat*50.0 + D
     S11 = (A + B/50.0 - C_mat*50.0 - D) / denom
     S12 = 2 * (A*D - B*C_mat) / denom
     S21 = 2 / denom
     S22 = (-A + B/50.0 - C_mat*50.0 + D) / denom
     
-    # 组合为 S 矩阵组: (频点数, 2, 2)
+    # 缁勫悎涓?S 鐭╅樀缁? (棰戠偣鏁? 2, 2)
     S_matrices = np.zeros((len(freqs), 2, 2), dtype=complex)
     S_matrices[:, 0, 0] = S11
     S_matrices[:, 0, 1] = S12
@@ -228,20 +228,20 @@ def calculate_S_parameters(circuit_params, length_um, freqs):
     return S_matrices
 
 # ==========================================
-# 4. 可视化对比
+# 4. 鍙鍖栧姣?
 # ==========================================
 def Plot_S_Comparison(hfss_nw, nn_nw):
-    # 5. 可视化对比
+    # 5. 鍙鍖栧姣?
     plt.figure(figsize=(12, 5))
     
-    # 画 S11 幅度
+    # 鐢?S11 骞呭害
     plt.subplot(1, 2, 1)
     hfss_nw.plot_s_db(m=0, n=0, color='blue', label='HFSS $S_{11}$')
     nn_nw.plot_s_db(m=0, n=0, color='red', linestyle='--', label='NN $S_{11}$')
     plt.title("S11 Magnitude (dB)")
     plt.grid(True)
     
-    # 画 S21 幅度
+    # 鐢?S21 骞呭害
     plt.subplot(1, 2, 2)
     hfss_nw.plot_s_db(m=1, n=0, color='blue', label='HFSS $S_{21}$')
     nn_nw.plot_s_db(m=1, n=0, color='red', linestyle='--', label='NN $S_{21}$')
@@ -252,37 +252,37 @@ def Plot_S_Comparison(hfss_nw, nn_nw):
     plt.show()
     
     mse = np.mean(np.abs(hfss_nw.s - nn_nw.s)**2)
-    print(f"\n>>> 对比结束！整体 S 矩阵均方误差 (MSE): {mse:.4e}")
+    print(f"\n>>> 瀵规瘮缁撴潫锛佹暣浣?S 鐭╅樀鍧囨柟璇樊 (MSE): {mse:.4e}")
 
 
 # ==========================================
-# 5. 计算S参数并构造网络
+# 5. 璁＄畻S鍙傛暟骞舵瀯閫犵綉缁?
 # ==========================================
 
 def Calc_RDL_Top_S(idx):
-    os.chdir(Path(__file__).resolve().parents[2])  # 切换到当前脚本目录，确保路径正确
-    s2p_file = rf"./data/sparameters/RDL_Top_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
-    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                            # .mat 模型存放的目录
-    model_prefix = "RDL_Top_"                # 神经网络导出的前缀
+    os.chdir(Path(__file__).resolve().parents[2])  # 鍒囨崲鍒板綋鍓嶈剼鏈洰褰曪紝纭繚璺緞姝ｇ‘
+    s2p_file = rf"./snp_data/RDL_Top_Snp/dut{idx}.s2p"         # HFSS 鍘熷娴嬭瘯鏁版嵁
+    mat_dir  = r"./device_models/RDL_TSV_mat2"                            # .mat 妯″瀷瀛樻斁鐨勭洰褰?
+    model_prefix = "RDL_Top_"                # 绁炵粡缃戠粶瀵煎嚭鐨勫墠缂€
     
     if not os.path.exists(s2p_file):
-        print(f"未找到测试文件: {s2p_file}")
+        print(f"鏈壘鍒版祴璇曟枃浠? {s2p_file}")
         return
 
-    # 1. 提取 HFSS 真实 S 参数
-    print(">>> 正在加载 HFSS 原始 S参数文件...")
+    # 1. 鎻愬彇 HFSS 鐪熷疄 S 鍙傛暟
+    print(">>> 姝ｅ湪鍔犺浇 HFSS 鍘熷 S鍙傛暟鏂囦欢...")
     RDL_Top_HFSS_NW = rf.Network(s2p_file)
     freqs = RDL_Top_HFSS_NW.f          
     
-    # 2. 提取器件物理参数作为输入
+    # 2. 鎻愬彇鍣ㄤ欢鐗╃悊鍙傛暟浣滀负杈撳叆
     device_features, length_um = extract_device_params_RDL_Top(s2p_file)
     print(device_features)
-    print(f">>> 提取到物理特征向量: {device_features}")
+    print(f">>> 鎻愬彇鍒扮墿鐞嗙壒寰佸悜閲? {device_features}")
     
-    # 3. 循环载入 9 个神经网络模型预测参数
+    # 3. 寰幆杞藉叆 9 涓缁忕綉缁滄ā鍨嬮娴嬪弬鏁?
     target_params = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
     
-    print(">>> 正在循环推理神经网络，预测等效电路参数...")
+    print(">>> 姝ｅ湪寰幆鎺ㄧ悊绁炵粡缃戠粶锛岄娴嬬瓑鏁堢數璺弬鏁?..")
     circuit_params = predict_circuit_parameters(device_features, mat_dir, target_params, prefix=model_prefix)
     
     for k, v in circuit_params.items():
@@ -293,8 +293,8 @@ def Calc_RDL_Top_S(idx):
         else:
             print(f"    - {k} : {v:.4e} (Ohm)")
         
-    # 4. 等效电路转化为预测的 S 矩阵
-    print(">>> 正在恢复物理量级，并基于 RLGC 频变模型生成 S 参数...")
+    # 4. 绛夋晥鐢佃矾杞寲涓洪娴嬬殑 S 鐭╅樀
+    print(">>> 姝ｅ湪鎭㈠鐗╃悊閲忕骇锛屽苟鍩轰簬 RLGC 棰戝彉妯″瀷鐢熸垚 S 鍙傛暟...")
     predicted_s_matrices = calculate_S_parameters(circuit_params, length_um, freqs)
     RDL_Top_NN_NW = rf.Network(frequency=RDL_Top_HFSS_NW.frequency, s=predicted_s_matrices, name="RDL_Top_NN_Predicted")
     RDL_Top_HFSS_NW.name = "RDL_Top_HFSS_Simulated"
@@ -302,29 +302,29 @@ def Calc_RDL_Top_S(idx):
     Plot_S_Comparison(RDL_Top_HFSS_NW, RDL_Top_NN_NW)
 
 def Calc_RDL_Bottom_S(idx):
-    os.chdir(Path(__file__).resolve().parents[2])  # 切换到当前脚本目录，确保路径正确
-    s2p_file = rf"./data/sparameters/RDL_Bottom_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
-    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                            # .mat 模型存放的目录
-    model_prefix = "RDL_Bottom_"                # 神经网络导出的前缀
+    os.chdir(Path(__file__).resolve().parents[2])  # 鍒囨崲鍒板綋鍓嶈剼鏈洰褰曪紝纭繚璺緞姝ｇ‘
+    s2p_file = rf"./snp_data/RDL_Bottom_Snp/dut{idx}.s2p"         # HFSS 鍘熷娴嬭瘯鏁版嵁
+    mat_dir  = r"./device_models/RDL_TSV_mat2"                            # .mat 妯″瀷瀛樻斁鐨勭洰褰?
+    model_prefix = "RDL_Bottom_"                # 绁炵粡缃戠粶瀵煎嚭鐨勫墠缂€
     
     if not os.path.exists(s2p_file):
-        print(f"未找到测试文件: {s2p_file}")
+        print(f"鏈壘鍒版祴璇曟枃浠? {s2p_file}")
         return
 
-    # 1. 提取 HFSS 真实 S 参数
-    print(">>> 正在加载 HFSS 原始 S参数文件...")
+    # 1. 鎻愬彇 HFSS 鐪熷疄 S 鍙傛暟
+    print(">>> 姝ｅ湪鍔犺浇 HFSS 鍘熷 S鍙傛暟鏂囦欢...")
     RDL_Bottom_HFSS_NW = rf.Network(s2p_file)
     freqs = RDL_Bottom_HFSS_NW.f          
     
-    # 2. 提取器件物理参数作为输入
+    # 2. 鎻愬彇鍣ㄤ欢鐗╃悊鍙傛暟浣滀负杈撳叆
     device_features, length_um = extract_device_params_RDL_Bottom(s2p_file)
     print(device_features)
-    print(f">>> 提取到物理特征向量: {device_features}")
+    print(f">>> 鎻愬彇鍒扮墿鐞嗙壒寰佸悜閲? {device_features}")
     
-    # 3. 循环载入 9 个神经网络模型预测参数
+    # 3. 寰幆杞藉叆 9 涓缁忕綉缁滄ā鍨嬮娴嬪弬鏁?
     target_params = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
     
-    print(">>> 正在循环推理神经网络，预测等效电路参数...")
+    print(">>> 姝ｅ湪寰幆鎺ㄧ悊绁炵粡缃戠粶锛岄娴嬬瓑鏁堢數璺弬鏁?..")
     circuit_params = predict_circuit_parameters(device_features, mat_dir, target_params, prefix=model_prefix)
     
     for k, v in circuit_params.items():
@@ -335,8 +335,8 @@ def Calc_RDL_Bottom_S(idx):
         else:
             print(f"    - {k} : {v:.4e} (Ohm)")
         
-    # 4. 等效电路转化为预测的 S 矩阵
-    print(">>> 正在恢复物理量级，并基于 RLGC 频变模型生成 S 参数...")
+    # 4. 绛夋晥鐢佃矾杞寲涓洪娴嬬殑 S 鐭╅樀
+    print(">>> 姝ｅ湪鎭㈠鐗╃悊閲忕骇锛屽苟鍩轰簬 RLGC 棰戝彉妯″瀷鐢熸垚 S 鍙傛暟...")
     predicted_s_matrices = calculate_S_parameters(circuit_params, length_um, freqs)
     
     RDL_Bottom_NN_NW = rf.Network(frequency=RDL_Bottom_HFSS_NW.frequency, s=predicted_s_matrices, name="RDL_Bottom_NN_Predicted")
@@ -344,29 +344,29 @@ def Calc_RDL_Bottom_S(idx):
     Plot_S_Comparison(RDL_Bottom_HFSS_NW, RDL_Bottom_NN_NW)
 
 def Calc_TSV_S(idx):
-    os.chdir(Path(__file__).resolve().parents[2])  # 切换到当前脚本目录，确保路径正确
-    s2p_file = rf"./data/sparameters/TSV_Snp/dut{idx}.s2p"         # HFSS 原始测试数据
-    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                            # .mat 模型存放的目录
-    model_prefix = "TSV_"                # 神经网络导出的前缀
+    os.chdir(Path(__file__).resolve().parents[2])  # 鍒囨崲鍒板綋鍓嶈剼鏈洰褰曪紝纭繚璺緞姝ｇ‘
+    s2p_file = rf"./snp_data/TSV_Snp/dut{idx}.s2p"         # HFSS 鍘熷娴嬭瘯鏁版嵁
+    mat_dir  = r"./device_models/RDL_TSV_mat2"                            # .mat 妯″瀷瀛樻斁鐨勭洰褰?
+    model_prefix = "TSV_"                # 绁炵粡缃戠粶瀵煎嚭鐨勫墠缂€
     
     if not os.path.exists(s2p_file):
-        print(f"未找到测试文件: {s2p_file}")
+        print(f"鏈壘鍒版祴璇曟枃浠? {s2p_file}")
         return
 
-    # 1. 提取 HFSS 真实 S 参数
-    print(">>> 正在加载 HFSS 原始 S参数文件...")
+    # 1. 鎻愬彇 HFSS 鐪熷疄 S 鍙傛暟
+    print(">>> 姝ｅ湪鍔犺浇 HFSS 鍘熷 S鍙傛暟鏂囦欢...")
     TSV_HFSS_NW = rf.Network(s2p_file)
     freqs = TSV_HFSS_NW.f          
     
-    # 2. 提取器件物理参数作为输入
+    # 2. 鎻愬彇鍣ㄤ欢鐗╃悊鍙傛暟浣滀负杈撳叆
     device_features, length_um = extract_device_params_TSV(s2p_file)
     print(device_features)
-    print(f">>> 提取到物理特征向量: {device_features}")
+    print(f">>> 鎻愬彇鍒扮墿鐞嗙壒寰佸悜閲? {device_features}")
     
-    # 3. 循环载入 9 个神经网络模型预测参数
+    # 3. 寰幆杞藉叆 9 涓缁忕綉缁滄ā鍨嬮娴嬪弬鏁?
     target_params = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
     
-    print(">>> 正在循环推理神经网络，预测等效电路参数...")
+    print(">>> 姝ｅ湪寰幆鎺ㄧ悊绁炵粡缃戠粶锛岄娴嬬瓑鏁堢數璺弬鏁?..")
     circuit_params = predict_circuit_parameters(device_features, mat_dir, target_params, prefix=model_prefix)
     
     for k, v in circuit_params.items():
@@ -377,8 +377,8 @@ def Calc_TSV_S(idx):
         else:
             print(f"    - {k} : {v:.4e} (Ohm)")
         
-    # 4. 等效电路转化为预测的 S 矩阵
-    print(">>> 正在恢复物理量级，并基于 RLGC 频变模型生成 S 参数...")
+    # 4. 绛夋晥鐢佃矾杞寲涓洪娴嬬殑 S 鐭╅樀
+    print(">>> 姝ｅ湪鎭㈠鐗╃悊閲忕骇锛屽苟鍩轰簬 RLGC 棰戝彉妯″瀷鐢熸垚 S 鍙傛暟...")
     predicted_s_matrices = calculate_S_parameters(circuit_params, length_um, freqs)
     TSV_NN_NW = rf.Network(frequency=TSV_HFSS_NW.frequency, s=predicted_s_matrices, name="TSV_NN_Predicted")
     TSV_HFSS_NW.name = "TSV_HFSS_Simulated"
@@ -386,37 +386,37 @@ def Calc_TSV_S(idx):
     Plot_S_Comparison(TSV_HFSS_NW, TSV_NN_NW)
 
 # ==========================================
-# 5. 【新增】级联计算核心函数 
+# 5. 銆愭柊澧炪€戠骇鑱旇绠楁牳蹇冨嚱鏁?
 # ==========================================
 def Calc_Cascaded_RDL_TSV_S(idx):
     os.chdir(Path(__file__).resolve().parents[2]) 
     
-    # 指向长链路全级联的 HFSS 测试文件
-    s2p_file = rf"./data/sparameters/RDL_TSV_Snp/dut{idx}.s2p"         
-    mat_dir  = r"./data/matlab_models/RDL_TSV_mat2"                   
+    # 鎸囧悜闀块摼璺叏绾ц仈鐨?HFSS 娴嬭瘯鏂囦欢
+    s2p_file = rf"./snp_data/RDL_TSV_Snp/dut{idx}.s2p"         
+    mat_dir  = r"./device_models/RDL_TSV_mat2"                   
     
     if not os.path.exists(s2p_file):
-        print(f"未找到测试文件: {s2p_file}")
+        print(f"鏈壘鍒版祴璇曟枃浠? {s2p_file}")
         return
 
-    # 1. 提取 HFSS 真实 S 参数
-    print(">>> 正在加载 HFSS 原始全链路 S参数文件...")
+    # 1. 鎻愬彇 HFSS 鐪熷疄 S 鍙傛暟
+    print(">>> 姝ｅ湪鍔犺浇 HFSS 鍘熷鍏ㄩ摼璺?S鍙傛暟鏂囦欢...")
     Cascaded_HFSS_NW = rf.Network(s2p_file)
     freqs = Cascaded_HFSS_NW.f          
     
-    # 2. 从总体 s2p 文件中提取所有物理尺寸参数
+    # 2. 浠庢€讳綋 s2p 鏂囦欢涓彁鍙栨墍鏈夌墿鐞嗗昂瀵稿弬鏁?
     params = extract_device_params_RDL_TSV(s2p_file)
-    print(f">>> 提取到物理参数: {params}")
+    print(f">>> 鎻愬彇鍒扮墿鐞嗗弬鏁? {params}")
     
-    # 将提取出的参数分别打包给对应的 NN 预测模型
+    # 灏嗘彁鍙栧嚭鐨勫弬鏁板垎鍒墦鍖呯粰瀵瑰簲鐨?NN 棰勬祴妯″瀷
     features_top = np.array([params['lrdl'], params['wrdl'], params['trdl'], params['htsv'], params['p1']])
     features_bot = np.array([params['ldown'], params['wdown'], params['tdown'], params['htsv'], params['p1']])
     features_tsv = np.array([params['dtsv'], params['htsv'], params['p1']])
     
     target_params = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
     
-    # 3. 分别计算 RDL_Top, RDL_Bottom, TSV 的单体 S 参数
-    print(">>> 正在预测单体组件的等效电路并计算 S 参数...")
+    # 3. 鍒嗗埆璁＄畻 RDL_Top, RDL_Bottom, TSV 鐨勫崟浣?S 鍙傛暟
+    print(">>> 姝ｅ湪棰勬祴鍗曚綋缁勪欢鐨勭瓑鏁堢數璺苟璁＄畻 S 鍙傛暟...")
     
     # -- RDL Top --
     cp_top = predict_circuit_parameters(features_top, mat_dir, target_params, prefix="RDL_Top_")
@@ -433,16 +433,16 @@ def Calc_Cascaded_RDL_TSV_S(idx):
     s_tsv = calculate_S_parameters(cp_tsv, params['htsv'], freqs)
     nw_tsv = rf.Network(frequency=Cascaded_HFSS_NW.frequency, s=s_tsv)
     
-    # 4. 执行级联矩阵运算 (skrf ** 操作符会自动将S转为T，相乘后转回S)
-    print(">>> 正在执行 S 参数矩阵级联 (Top - TSV - Bot - TSV - Top - TSV - Bot - TSV - Top) ...")
+    # 4. 鎵ц绾ц仈鐭╅樀杩愮畻 (skrf ** 鎿嶄綔绗︿細鑷姩灏哠杞负T锛岀浉涔樺悗杞洖S)
+    print(">>> 姝ｅ湪鎵ц S 鍙傛暟鐭╅樀绾ц仈 (Top - TSV - Bot - TSV - Top - TSV - Bot - TSV - Top) ...")
     
-    # 9 段级联计算
+    # 9 娈电骇鑱旇绠?
     nw_cascade = nw_top ** nw_tsv ** nw_bot ** nw_tsv ** nw_top ** nw_tsv ** nw_bot ** nw_tsv ** nw_top
     
     nw_cascade.name = "9-Stage_Cascaded_NN_Predicted"
     Cascaded_HFSS_NW.name = "RDL_TSV_HFSS_Simulated"
 
-    # 5. 可视化对比结果
+    # 5. 鍙鍖栧姣旂粨鏋?
     Plot_S_Comparison(Cascaded_HFSS_NW, nw_cascade)
     
 
@@ -450,53 +450,53 @@ def Calc_Cascaded_RDL_TSV_S(idx):
 def Batch_Calc_Cascaded_RDL_TSV_S():
     os.chdir(Path(__file__).resolve().parents[2]) 
     
-    # 路径配置
-    input_dir  = r"./data/sparameters/RDL_TSV_Snp"
-    output_dir = r"./data/sparameters/RDL_TSV_NN_Snp"
-    mat_dir    = r"./data/matlab_models/RDL_TSV_mat2"
+    # 璺緞閰嶇疆
+    input_dir  = r"./snp_data/RDL_TSV_Snp"
+    output_dir = r"./snp_data/RDL_TSV_NN_Snp"
+    mat_dir    = r"./device_models/RDL_TSV_mat2"
     
-    # 如果输出文件夹不存在，则自动创建
+    # 濡傛灉杈撳嚭鏂囦欢澶逛笉瀛樺湪锛屽垯鑷姩鍒涘缓
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-        print(f">>> 已创建输出目录: {output_dir}")
+        print(f">>> 宸插垱寤鸿緭鍑虹洰褰? {output_dir}")
 
-    # 获取输入目录下所有的 .s2p 文件
+    # 鑾峰彇杈撳叆鐩綍涓嬫墍鏈夌殑 .s2p 鏂囦欢
     s2p_files = glob.glob(os.path.join(input_dir, "*.s2p"))
     
     if not s2p_files:
-        print(f"未在 {input_dir} 中找到任何 .s2p 测试文件！")
+        print(f"No .s2p files found in {input_dir}.")
         return
 
-    print(f">>> 共扫描到 {len(s2p_files)} 个 .s2p 文件，准备开始批量级联处理...\n")
+    print(f">>> 鍏辨壂鎻忓埌 {len(s2p_files)} 涓?.s2p 鏂囦欢锛屽噯澶囧紑濮嬫壒閲忕骇鑱斿鐞?..\n")
 
     target_params = ["R1", "R2", "R3", "L1", "L2", "L3", "Cox", "Csi", "Rsi"]
 
-    # 遍历处理每一个 s2p 文件
+    # 閬嶅巻澶勭悊姣忎竴涓?s2p 鏂囦欢
     for s2p_file in s2p_files:
-        filename = os.path.basename(s2p_file)  # 获取诸如 "dut0.s2p" 的纯文件名
-        print(f"--- 正在处理: {filename} ---")
+        filename = os.path.basename(s2p_file)  # 鑾峰彇璇稿 "dut0.s2p" 鐨勭函鏂囦欢鍚?
+        print(f"--- 姝ｅ湪澶勭悊: {filename} ---")
         
-        # 1. 提取 HFSS 真实 S 参数（主要用于获取正确的频率点 frequency）
+        # 1. 鎻愬彇 HFSS 鐪熷疄 S 鍙傛暟锛堜富瑕佺敤浜庤幏鍙栨纭殑棰戠巼鐐?frequency锛?
         try:
             Cascaded_HFSS_NW = rf.Network(s2p_file)
             freqs = Cascaded_HFSS_NW.f          
         except Exception as e:
-            print(f"读取文件失败，跳过 {filename}。报错: {e}")
+            print(f"璇诲彇鏂囦欢澶辫触锛岃烦杩?{filename}銆傛姤閿? {e}")
             continue
         
-        # 2. 从总体 s2p 文件中提取所有物理尺寸参数
+        # 2. 浠庢€讳綋 s2p 鏂囦欢涓彁鍙栨墍鏈夌墿鐞嗗昂瀵稿弬鏁?
         try:
             params = extract_device_params_RDL_TSV(s2p_file)
         except Exception as e:
-            print(f"提取物理参数失败，跳过 {filename}。报错: {e}")
+            print(f"鎻愬彇鐗╃悊鍙傛暟澶辫触锛岃烦杩?{filename}銆傛姤閿? {e}")
             continue
             
-        # 将提取出的参数分别打包给对应的 NN 预测模型
+        # 灏嗘彁鍙栧嚭鐨勫弬鏁板垎鍒墦鍖呯粰瀵瑰簲鐨?NN 棰勬祴妯″瀷
         features_top = np.array([params['lrdl'], params['wrdl'], params['trdl'], params['htsv'], params['p1']])
         features_bot = np.array([params['ldown'], params['wdown'], params['tdown'], params['htsv'], params['p1']])
         features_tsv = np.array([params['dtsv'], params['htsv'], params['p1']])
         
-        # 3. 分别计算 RDL_Top, RDL_Bottom, TSV 的单体 S 参数
+        # 3. 鍒嗗埆璁＄畻 RDL_Top, RDL_Bottom, TSV 鐨勫崟浣?S 鍙傛暟
         # -- RDL Top --
         cp_top = predict_circuit_parameters(features_top, mat_dir, target_params, prefix="RDL_Top_")
         s_top = calculate_S_parameters(cp_top, params['lrdl'], freqs)
@@ -512,45 +512,45 @@ def Batch_Calc_Cascaded_RDL_TSV_S():
         s_tsv = calculate_S_parameters(cp_tsv, params['htsv'], freqs)
         nw_tsv = rf.Network(frequency=Cascaded_HFSS_NW.frequency, s=s_tsv)
         
-        # 4. 执行级联矩阵运算 
+        # 4. 鎵ц绾ц仈鐭╅樀杩愮畻 
         # (Top - TSV - Bot - TSV - Top - TSV - Bot - TSV - Top)
         nw_cascade = nw_top ** nw_tsv ** nw_bot ** nw_tsv ** nw_top ** nw_tsv ** nw_bot ** nw_tsv ** nw_top
         
-        # 设置生成的 Network 名称，防止导出的 touchstone 文件里有奇怪的注释名
+        # 璁剧疆鐢熸垚鐨?Network 鍚嶇О锛岄槻姝㈠鍑虹殑 touchstone 鏂囦欢閲屾湁濂囨€殑娉ㄩ噴鍚?
         nw_cascade.name = filename.replace(".s2p", "")
 
-        # 5. 保存级联得到的 S 参数到目标目录，名字保持一一对应
+        # 5. 淇濆瓨绾ц仈寰楀埌鐨?S 鍙傛暟鍒扮洰鏍囩洰褰曪紝鍚嶅瓧淇濇寔涓€涓€瀵瑰簲
         nw_cascade.write_touchstone(filename=filename, dir=output_dir)
-        print(f"    [成功] 已级联并保存至 -> {os.path.join(output_dir, filename)}\n")
+        print(f"    [鎴愬姛] 宸茬骇鑱斿苟淇濆瓨鑷?-> {os.path.join(output_dir, filename)}\n")
         
 
-def Compare_Snp_Directories(dir_original="./data/sparameters/RDL_TSV_Snp", dir_predicted="./data/sparameters/RDL_TSV_NN_Snp", plot_worst_case=True):
+def Compare_Snp_Directories(dir_original="./snp_data/RDL_TSV_Snp", dir_predicted="./snp_data/RDL_TSV_NN_Snp", plot_worst_case=True):
     """
-    对比两个文件夹下同名的 S 参数文件。
-    :param dir_original: 原始 HFSS S参数文件夹路径
-    :param dir_predicted: 神经网络预测 S参数文件夹路径
-    :param plot_worst_case: 是否在对比结束后自动画出误差最大的一组数据进行人工确认
+    瀵规瘮涓や釜鏂囦欢澶逛笅鍚屽悕鐨?S 鍙傛暟鏂囦欢銆?
+    :param dir_original: 鍘熷 HFSS S鍙傛暟鏂囦欢澶硅矾寰?
+    :param dir_predicted: 绁炵粡缃戠粶棰勬祴 S鍙傛暟鏂囦欢澶硅矾寰?
+    :param plot_worst_case: 鏄惁鍦ㄥ姣旂粨鏉熷悗鑷姩鐢诲嚭璇樊鏈€澶х殑涓€缁勬暟鎹繘琛屼汉宸ョ‘璁?
     """
     os.chdir(Path(__file__).resolve().parents[2])
     
     if not os.path.exists(dir_original):
-        print(f"错误: 找不到原始文件夹 {dir_original}")
+        print(f"閿欒: 鎵句笉鍒板師濮嬫枃浠跺す {dir_original}")
         return
     if not os.path.exists(dir_predicted):
-        print(f"错误: 找不到预测文件夹 {dir_predicted}")
+        print(f"閿欒: 鎵句笉鍒伴娴嬫枃浠跺す {dir_predicted}")
         return
 
-    # 获取原始文件夹中所有的 .s2p 文件
+    # 鑾峰彇鍘熷鏂囦欢澶逛腑鎵€鏈夌殑 .s2p 鏂囦欢
     s2p_files_orig = glob.glob(os.path.join(dir_original, "*.s*p"))
     
     if not s2p_files_orig:
-        print(f"在 {dir_original} 中没有找到任何 S 参数文件。")
+        print(f"No S-parameter files found in {dir_original}.")
         return
 
     print("==================================================")
-    print(f"开始批量对比 S 参数: ")
-    print(f"  基准数据: {dir_original}")
-    print(f"  待测数据: {dir_predicted}")
+    print(f"寮€濮嬫壒閲忓姣?S 鍙傛暟: ")
+    print(f"  鍩哄噯鏁版嵁: {dir_original}")
+    print(f"  寰呮祴鏁版嵁: {dir_predicted}")
     print("==================================================")
 
     mse_list = []
@@ -558,26 +558,26 @@ def Compare_Snp_Directories(dir_original="./data/sparameters/RDL_TSV_Snp", dir_p
     worst_mse = -1
     worst_file = None
 
-    # 遍历原始文件夹里的文件
+    # 閬嶅巻鍘熷鏂囦欢澶归噷鐨勬枃浠?
     for orig_filepath in s2p_files_orig:
         filename = os.path.basename(orig_filepath)
         pred_filepath = os.path.join(dir_predicted, filename)
         
-        # 检查预测文件夹中是否存在同名文件
+        # 妫€鏌ラ娴嬫枃浠跺す涓槸鍚﹀瓨鍦ㄥ悓鍚嶆枃浠?
         if not os.path.exists(pred_filepath):
-            print(f"[跳过] 缺失对应文件: {filename}")
+            print(f"[璺宠繃] 缂哄け瀵瑰簲鏂囦欢: {filename}")
             continue
             
         try:
             nw_orig = rf.Network(orig_filepath)
             nw_pred = rf.Network(pred_filepath)
             
-            # 计算该对文件的 MSE (均方误差)
+            # 璁＄畻璇ュ鏂囦欢鐨?MSE (鍧囨柟璇樊)
             mse = np.mean(np.abs(nw_orig.s - nw_pred.s)**2)
             mse_list.append(mse)
             matched_count += 1
             
-            # 记录误差最大的一组
+            # 璁板綍璇樊鏈€澶х殑涓€缁?
             if mse > worst_mse:
                 worst_mse = mse
                 worst_file = filename
@@ -585,11 +585,11 @@ def Compare_Snp_Directories(dir_original="./data/sparameters/RDL_TSV_Snp", dir_p
                 worst_nw_pred = nw_pred
                 
         except Exception as e:
-            print(f"[报错] 处理文件 {filename} 时发生异常: {e}")
+            print(f"[鎶ラ敊] 澶勭悊鏂囦欢 {filename} 鏃跺彂鐢熷紓甯? {e}")
 
-    # ================= 统计与报告 =================
+    # ================= 缁熻涓庢姤鍛?=================
     if matched_count == 0:
-        print("没有找到任何能成对匹配的文件！")
+        print("No matching file pairs found.")
         return
 
     mse_array = np.array(mse_list)
@@ -597,26 +597,26 @@ def Compare_Snp_Directories(dir_original="./data/sparameters/RDL_TSV_Snp", dir_p
     max_mse = np.max(mse_array)
     min_mse = np.min(mse_array)
 
-    print(f"\n对比完成！成功配对文件数: {matched_count}")
+    print(f"\n瀵规瘮瀹屾垚锛佹垚鍔熼厤瀵规枃浠舵暟: {matched_count}")
     print(f"----------------------------------------")
-    print(f"  [整体平均误差 (Avg MSE)] : {avg_mse:.6e}")
-    print(f"  [最小误差案例 (Min MSE)] : {min_mse:.6e}")
-    print(f"  [最大误差案例 (Max MSE)] : {max_mse:.6e}  (对应文件: {worst_file})")
+    print(f"  [鏁翠綋骞冲潎璇樊 (Avg MSE)] : {avg_mse:.6e}")
+    print(f"  [鏈€灏忚宸渚?(Min MSE)] : {min_mse:.6e}")
+    print(f"  [鏈€澶ц宸渚?(Max MSE)] : {max_mse:.6e}  (瀵瑰簲鏂囦欢: {worst_file})")
     print("==================================================")
 
-    # 自动将误差最大的文件画图展示出来，以便排查是哪个环节拟合得不好
+    # 鑷姩灏嗚宸渶澶х殑鏂囦欢鐢诲浘灞曠ず鍑烘潵锛屼互渚挎帓鏌ユ槸鍝釜鐜妭鎷熷悎寰椾笉濂?
     if plot_worst_case and worst_file:
-        print(f"\n>>> 正在绘制误差最大的文件 ({worst_file}) 以供排查...")
+        print(f"\n>>> 姝ｅ湪缁樺埗璇樊鏈€澶х殑鏂囦欢 ({worst_file}) 浠ヤ緵鎺掓煡...")
         plt.figure(figsize=(12, 5))
         
-        # S11 幅度
+        # S11 骞呭害
         plt.subplot(1, 2, 1)
         worst_nw_orig.plot_s_db(m=0, n=0, color='blue', label='HFSS $S_{11}$')
         worst_nw_pred.plot_s_db(m=0, n=0, color='red', linestyle='--', label='NN $S_{11}$')
         plt.title(f"{worst_file} - S11 Magnitude (dB)")
         plt.grid(True)
         
-        # S21 幅度
+        # S21 骞呭害
         plt.subplot(1, 2, 2)
         worst_nw_orig.plot_s_db(m=1, n=0, color='blue', label='HFSS $S_{21}$')
         worst_nw_pred.plot_s_db(m=1, n=0, color='red', linestyle='--', label='NN $S_{21}$')
