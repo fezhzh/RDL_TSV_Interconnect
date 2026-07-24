@@ -1,0 +1,27 @@
+
+hpeesofsim (*) 637.update1.2 Jan 22 2026, MINT version 5
+    (64-bit windows built: Thu Jan 22, 2026 21:43:01 +0000)
+
+***** Simulation started at Tue Jul  7 09:38:21 2026
+      Running on host: "Feng"
+      In Directory: "C:\ffzhzh\SyncFiles\Temp\model_versions\v10_ads_pi_cascade\ads_sim"
+      Process ID: 55492
+
+Parsing the netlist ...
+Flattening the netlist ...
+Loading Post-Processing Module SPOutput (['./touchstone/MCLIN_10_', 'touchstone', 'RI'] )
+Loading Sweep Module CSV_List (['./csvfiles/MCLIN_10.csv '] )
+
+Error detected by hpeesofsim in Python script during BatchSim Analysis `BatchSim1'.
+    CSV_List: Failed to open file './csvfiles/MCLIN_10.csv '
+
+
+-------------------------------------------------------------------------------
+Simulation finished with errors.
+-------------------------------------------------------------------------------
+Flushing data (please wait) ...
+     ... data flush done.
+
+Resource usage:
+  Total stopwatch time     =     0.72 seconds.
+

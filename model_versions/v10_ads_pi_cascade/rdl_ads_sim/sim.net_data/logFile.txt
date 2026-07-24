@@ -1,0 +1,18 @@
+
+hpeesofsim (*) 637.update1.2 Jan 22 2026, MINT version 5
+    (64-bit windows built: Thu Jan 22, 2026 21:43:01 +0000)
+
+***** Simulation started at Tue Jul  7 09:59:59 2026
+      Running on host: "Feng"
+      In Directory: "C:\ffzhzh\SyncFiles\Temp\model_versions\v10_ads_pi_cascade\ads_sim"
+      Process ID: 19396
+
+Parsing the netlist ...
+
+Error detected by hpeesofsim during netlist parsing.
+    cpp: line 43, Error: Illegal # command "Controller"
+    sim.net
+
+Flushing data (please wait) ...
+     ... data flush done.
+

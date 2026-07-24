@@ -1,0 +1,29 @@
+
+hpeesofsim (*) 637.update1.2 Jan 22 2026, MINT version 5
+    (64-bit windows built: Thu Jan 22, 2026 21:43:01 +0000)
+
+***** Simulation started at Sat Jul 11 20:44:42 2026
+      Running on host: "Feng"
+      In Directory: "C:\ffzhzh\SyncFiles\Temp\model_versions\v11_ads_v08_multihead_chain\rdl_ads_sim"
+      Process ID: 56780
+
+Parsing the netlist ...
+Flattening the netlist ...
+Loading Post-Processing Module SPOutput (['C:/ffzhzh/SyncFiles/Temp/model_versions/v11_ads_v08_multihead_chain/results/v11_positive_sharedopt_lhs400_connection2_goodstart_all_adslen09/ads_cache/LHS400_Connection2_train_dut200_BSMRDL', 'touchstone', 'MA'] )
+
+SP SP1[1] <LHS400_Connection2_train_dut200_BSMRDL.net>   freq=(100 MHz->100 GHz)
+
+Checking for unresolved variables ...
+Post-Processing Module 'PostProcessingModule'.process
+Flushing data (please wait) ...
+     ... data flush done.
+
+Resource usage:
+  Total stopwatch time     =     0.86 seconds.
+
+
+***** Simulation finished at Sat Jul 11 20:44:42 2026
+
+
+
+STDERR:

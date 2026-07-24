@@ -1,0 +1,26 @@
+﻿Validation archive for HFSS_sim/batchsim_150train_50test_connection2.py
+Timestamp: 2026-07-09 23:30:28 +08:00
+
+Changes validated:
+- Added TSV_RDL train=400 to rdl_tsv_lhs400 dataset under HFSS_sim\LHS400_Connection2\.
+- LHS400_Connection2 now contains RDL, TSV, and TSV_RDL train-only designs.
+- Reordered DATASET_CONFIGS so LHS400_Connection2 is processed before the older LHS150_50_Connection2 dataset.
+- Set NUM_PARALLEL=3 for AEDT stability.
+
+Checks completed:
+- python -m py_compile HFSS_sim\batchsim_150train_50test_connection2.py: passed
+- conda run -n PyAnsys python -m py_compile HFSS_sim\batchsim_150train_50test_connection2.py: passed
+- AEDT project exists: C:\ffzhzh\LocalFiles\Ansys_Project_Files\TSV_RDL_Connection2.aedt
+- Designs checked: RDL, TSV, TSV_RDL
+- HFSS variable mapping: t_tmrdl -> h_tmrdl; t_bsmrdl -> h_bsmrdl
+- LHS records checked:
+  - RDL train: 400 rows, dut0 to dut399
+  - TSV train: 400 rows, dut0 to dut399
+  - TSV_RDL train: 400 rows, dut0 to dut399
+  - TSV_RDL 150/50 legacy records still load correctly
+- Range and pitch validity checks: passed for all generated rows
+
+Pre-run output counts:
+- RDL S2P: 400 / 400
+- TSV S2P: 400 / 400
+- TSV_RDL S2P: 0 / 400

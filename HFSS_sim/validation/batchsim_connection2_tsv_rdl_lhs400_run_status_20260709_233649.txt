@@ -1,0 +1,21 @@
+﻿Run status for HFSS_sim/batchsim_150train_50test_connection2.py
+Timestamp: 2026-07-09 23:36:49 +08:00
+
+Run request:
+- Add and run TSV_RDL LHS400 under HFSS_sim\LHS400_Connection2\.
+
+Validation before run:
+- TSV_RDL_variations_record.csv exists with 400 rows, dut0 to dut399.
+- RDL and TSV each already have 400 .s2p files.
+- TSV_RDL had 0 .s2p files before this run.
+
+Run launch:
+- Started with conda run -n PyAnsys python -u HFSS_sim\batchsim_150train_50test_connection2.py
+- NUM_PARALLEL=3
+- Stdout log: C:\ffzhzh\SyncFiles\Temp\HFSS_sim\LHS400_Connection2\batchsim_tsv_rdl_lhs400_run_20260709_233038_stdout.log
+- Stderr log: C:\ffzhzh\SyncFiles\Temp\HFSS_sim\LHS400_Connection2\batchsim_tsv_rdl_lhs400_run_20260709_233038_stderr.log
+
+Current status at archive time:
+- TSV_RDL S2P count: 1 / 400
+- Active new AEDT/python worker processes are present.
+- No stderr content was present at this check.

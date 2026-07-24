@@ -1,0 +1,46 @@
+; Top Design: "MyLibrary1_lib:cell_1:schematic"
+; Netlisted using Hierarchy Policy: "Standard"
+
+
+Options ResourceUsage=yes UseNutmegFormat=no EnableOptim=no TopDesignName="MyLibrary1_lib:cell_1:schematic" DcopOutputNodeVoltages=yes DcopOutputPinCurrents=yes DcopOutputAllSweepPoints=no DcopOutputDcopType=0
+
+l_rdl=0.00089936
+w_rdl=1.9116e-05
+pitch=4.102e-05
+h_tsv=9.359e-05
+er_si=10.8
+h_rdl=5.96e-06
+cond=58000000
+tand=0.01
+
+MLIN2:TL1  N__3 N__4 Subst="MSub1" W=w_rdl L=l_rdl Wall1=2.5000000000000002e+28 mm Wall2=2.5000000000000002e+28 mm Mod=1
+model MSub1 MSUB H=pitch-w_rdl Er=er_si Mur=1 Cond=cond Hu=1e+33 mm T=h_rdl TanD=tand Rough=0 mm DielectricLossModel=1 FreqForEpsrTanD=1.0 GHz LowFreqForTanD=1.0 kHz HighFreqForTanD=1.0 THz RoughnessModel=2 
+
+S_Param:SP1 CalcS=yes CalcY=no CalcZ=no GroupDelayAperture=1e-4 FreqConversion=no FreqConversionPort=1 StatusLevel=2 CalcNoise=no SortNoise=0 BandwidthForNoise=1.0 Hz DevOpPtLevel=0 SPSS_WSP=yes \
+SweepVar="freq" SweepPlan="SP1_stim" OutputPlan="SP1_Output" 
+SweepPlan: SP1_stim Start=0.1 GHz Stop=20 GHz Step=0.1 GHz 
+
+
+OutputPlan:SP1_Output \
+      Type="Output" \
+      UseEquationNestLevel=yes \
+      EquationNestLevel=2 \
+      UseSavedEquationNestLevel=yes \
+      SavedEquationNestLevel=2
+
+#load "python","LinearCollapse"
+Component Module="LinearCollapse" Type="ModelExtractor" NetworkRepresentation=2
+
+Port:Term2  N__4 0 Num=2 Z=50 Ohm Noise=yes 
+Port:Term1  N__3 0 Num=1 Z=50 Ohm Noise=yes  
+ 
+
+
+#load "python","PostProcessing"
+Controller Module="PostProcessing" \ 
+PostProcessingModule="SPOutput" \ 
+Argument[1] = "C:/ffzhzh/SyncFiles/Temp/model_versions/v10_ads_pi_cascade/results/ads_cal_rdl_update16/ads_cache/rdl/er_si-10p8__cond-5p8e07__tand-0p01__l_scale-1__w_scale-0p9__pitch_scale-1__h_tsv_scale-1__h_rdl_scale-1/LHS200_train_dut166_BSMRDL" \ 
+Argument[2] = "touchstone" \ 
+Argument[3] = "MA"  
+
+

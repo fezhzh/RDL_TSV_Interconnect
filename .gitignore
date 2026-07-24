@@ -12,6 +12,11 @@ archive/
 *.pt
 
 # Generated experiment outputs
+model_versions/*/results/**
+!model_versions/*/results/
+!model_versions/*/results/README.md
+
+# Deprecated generated output root
 model_results/
 *.png
 

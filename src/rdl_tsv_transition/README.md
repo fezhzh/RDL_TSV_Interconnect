@@ -1,4 +1,4 @@
-﻿# rdl_tsv_transition
+# rdl_tsv_transition
 
 RDL/TSV 绾ц仈銆佽繃娓＄粨鏋勫缓妯°€佸叡浜繃娓＄粨鏋勭缁忕綉缁滆缁冨拰 HFSS 绔埌绔井璋冨伐鍏峰寘銆?
 鍘熷鍗曟枃浠惰剼鏈凡鎷嗗垎涓哄涓ā鍧椼€傚吋瀹瑰叆鍙ｄ粛淇濈暀鍦ㄤ笂涓€绾х洰褰曪細
@@ -31,7 +31,7 @@ snp_data/RDL_TSV_Snp/
   dut2.s2p
   ...
 
-device_models/RDL_TSV_mat2/
+model_versions/v01_matlab_mat_models/models/RDL_TSV_mat2/
   RDL_Top_R1.mat
   RDL_Top_R2.mat
   ...
@@ -153,7 +153,7 @@ PyTorch 鐗堟湰鐨勮繃娓＄粨鏋勭骇鑱旓紝鐢ㄤ簬绔埌绔井
 - `save_structure_sample`锛氫繚瀛樺崟 DUT 鐨勬牱鏈噯澶囩粨鏋溿€?- `save_training_dataset`锛氫繚瀛樺悎骞跺悗鐨勭洃鐫ｈ缁冮泦銆?- `save_normalizer`锛氫繚瀛樻爣鍑嗗寲鍙傛暟銆?- `save_model_checkpoint`锛氫繚瀛?NN 鏉冮噸鍜屾爣鍑嗗寲鍣ㄣ€?- `save_evaluation_result`锛氫繚瀛樻瘡涓?DUT 鐨勯娴嬬粨鏋溿€丼 鍙傛暟鍜?MSE銆?- `save_mse_summary`锛氫繚瀛樺叏鏁版嵁闆?MSE 姹囨€汇€?
 榛樿淇濆瓨鐩綍锛?
 ```text
-model_results/training/RDL_TSV_results/
+model_versions/v99_legacy_and_shared/results/RDL_TSV_results/
   intermediate/
     dut001/
       metadata.json
@@ -235,8 +235,8 @@ NN fine-tuned transition
 鍒嗘瀽缁撴灉淇濆瓨鍒帮細
 
 ```text
-model_results/training/RDL_TSV_results/intermediate/dataset/error_analysis.json
-model_results/training/RDL_TSV_results/intermediate/dataset/error_analysis.md
+model_versions/v99_legacy_and_shared/results/RDL_TSV_results/intermediate/dataset/error_analysis.json
+model_versions/v99_legacy_and_shared/results/RDL_TSV_results/intermediate/dataset/error_analysis.md
 ```
 
 濡傛灉寮€鍚?`plot=True` 鎴?`save_plot=True`锛屼細缁樺埗锛?
@@ -261,7 +261,7 @@ run_dataset_training(
     start_idx=1,
     end_idx=10,
     s2p_dir="./snp_data/RDL_TSV_Snp",
-    mat_dir="./device_models/RDL_TSV_mat2",
+    mat_dir="./model_versions/v01_matlab_mat_models/models/RDL_TSV_mat2",
     max_points=None,
     supervised_epochs=2000,
     fine_epochs=1000,
@@ -273,7 +273,7 @@ run_dataset_training(
     fine_sample_batch_size=2,
     plot=True,
     save_plot=False,
-    out_dir="./model_results/training/RDL_TSV_results",
+    out_dir="./model_versions/v99_legacy_and_shared/results/RDL_TSV_results",
     save_intermediate=True,
     verbose=True,
 )
@@ -287,13 +287,13 @@ output = run_dataset_training(
     start_idx=1,
     end_idx=10,
     s2p_dir="./snp_data/RDL_TSV_Snp",
-    mat_dir="./device_models/RDL_TSV_mat2",
+    mat_dir="./model_versions/v01_matlab_mat_models/models/RDL_TSV_mat2",
     max_points=300,
     supervised_epochs=500,
     fine_epochs=200,
     plot=False,
     save_plot=True,
-    out_dir="./model_results/training/RDL_TSV_results",
+    out_dir="./model_versions/v99_legacy_and_shared/results/RDL_TSV_results",
     save_intermediate=True,
 )
 ```
@@ -322,7 +322,7 @@ from rdl_tsv_transition import run_one_dut
 result = run_one_dut(
     idx=1,
     s2p_dir="./snp_data/RDL_TSV_Snp",
-    mat_dir="./device_models/RDL_TSV_mat2",
+    mat_dir="./model_versions/v01_matlab_mat_models/models/RDL_TSV_mat2",
     max_points=300,
     supervised_epochs=200,
     fine_epochs=100,
@@ -366,7 +366,7 @@ output = run_dataset_training(
 ```python
 import numpy as np
 
-data = np.load("./model_results/training/RDL_TSV_results/intermediate/dataset/transition_training_dataset.npz")
+data = np.load("./model_versions/v99_legacy_and_shared/results/RDL_TSV_results/intermediate/dataset/transition_training_dataset.npz")
 X_all = data["X_all"]
 Y_all = data["Y_all"]
 ```
@@ -374,7 +374,7 @@ Y_all = data["Y_all"]
 璇诲彇鏌愪釜 DUT 鐨勬牱鏈暟缁勶細
 
 ```python
-sample = np.load("./model_results/training/RDL_TSV_results/intermediate/dut001/sample_arrays.npz")
+sample = np.load("./model_versions/v99_legacy_and_shared/results/RDL_TSV_results/intermediate/dut001/sample_arrays.npz")
 freqs_hz = sample["freqs_hz"]
 hfss_s = sample["hfss_s"]
 direct_full_s = sample["direct_full_s"]
@@ -388,7 +388,7 @@ Y_raw = sample["Y_raw"]
 import torch
 from rdl_tsv_transition.model import TransitionElementNN, Normalizer
 
-ckpt = torch.load("./model_results/training/RDL_TSV_results/intermediate/models/transition_model_fine_tuned.pth")
+ckpt = torch.load("./model_versions/v99_legacy_and_shared/results/RDL_TSV_results/intermediate/models/transition_model_fine_tuned.pth")
 
 model = TransitionElementNN(hidden=ckpt["extra"]["hidden"]).to(dtype=torch.float64)
 model.load_state_dict(ckpt["model_state_dict"])
@@ -407,15 +407,15 @@ normalizer = Normalizer(
 ```python
 import pandas as pd
 
-pretrain_loss = pd.read_csv("./model_results/training/RDL_TSV_results/intermediate/loss_curves/supervised_pretrain_loss.csv")
-fine_loss = pd.read_csv("./model_results/training/RDL_TSV_results/intermediate/loss_curves/hfss_fine_tune_loss.csv")
+pretrain_loss = pd.read_csv("./model_versions/v99_legacy_and_shared/results/RDL_TSV_results/intermediate/loss_curves/supervised_pretrain_loss.csv")
+fine_loss = pd.read_csv("./model_versions/v99_legacy_and_shared/results/RDL_TSV_results/intermediate/loss_curves/hfss_fine_tune_loss.csv")
 ```
 
 璇诲彇璇樊鍒嗘瀽锛?
 ```python
 import json
 
-with open("./model_results/training/RDL_TSV_results/intermediate/dataset/error_analysis.json", "r", encoding="utf-8") as f:
+with open("./model_versions/v99_legacy_and_shared/results/RDL_TSV_results/intermediate/dataset/error_analysis.json", "r", encoding="utf-8") as f:
     analysis = json.load(f)
 
 print(analysis["best_model_by_mean_mse"])

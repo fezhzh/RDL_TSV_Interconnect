@@ -1,0 +1,47 @@
+; Top Design: "MyLibrary1_lib:cell_1:schematic"
+; Netlisted using Hierarchy Policy: "Standard"
+
+
+Options ResourceUsage=yes UseNutmegFormat=no EnableOptim=no TopDesignName="MyLibrary1_lib:cell_2:schematic" DcopOutputNodeVoltages=yes DcopOutputPinCurrents=yes DcopOutputAllSweepPoints=no DcopOutputDcopType=0
+
+h_tsv=100.8612um
+d_tsv=27.9um
+er_si=11.9
+cond=58000000
+tand=0.005
+pitch=56.672um
+er_0=8.85e-12
+c1=1*(pi*er_si*er_0/acosh(pitch/d_tsv)*h_tsv)
+
+model Subst1 Substrate N=2 Er=er_si H=h_tsv TanD=tand T[1]=10 um Cond[1]=cond T[2]=10 um Cond[2]=cond LayerType[1]="signal" LayerType[2]="signal" DielectricLossModel=1 FreqForEpsrTanD=1.0 GHz LowFreqForTanD=1.0 kHz HighFreqForTanD=1.0 THz RoughnessModel=2 Rough=0 mm Huray_RatioOfA=1 Huray_r=0 um Huray_Aflat=0 um * 1 um Huray_N=14 
+
+S_Param:SP1 CalcS=yes CalcY=no CalcZ=no GroupDelayAperture=1e-4 FreqConversion=no FreqConversionPort=1 StatusLevel=2 CalcNoise=no SortNoise=0 BandwidthForNoise=1.0 Hz DevOpPtLevel=0 SPSS_WSP=yes \
+SweepVar="freq" SweepPlan="SP1_stim" OutputPlan="SP1_Output" 
+SweepPlan: SP1_stim Start=0.1 GHz Stop=100 GHz Step=0.1 GHz 
+
+
+OutputPlan:SP1_Output \
+      Type="Output" \
+      UseEquationNestLevel=yes \
+      EquationNestLevel=2 \
+      UseSavedEquationNestLevel=yes \
+      SavedEquationNestLevel=2
+
+
+
+#load "python","LinearCollapse"
+Component Module="LinearCollapse" Type="ModelExtractor" NetworkRepresentation=2
+Port:Term1  N__15 N__16 Num=1 Z=50 Ohm Noise=yes 
+VIA2:V2  N__16 0 D=d_tsv H=h_tsv T=d_tsv/2-0.1um Rho=45.2e6/cond W=d_tsv 
+VIA2:V3  N__15 N__17 D=d_tsv H=h_tsv T=d_tsv/2-0.1um Rho=45.2e6/cond W=d_tsv 
+C:C2  0 N__17 C=c1/2 
+Port:Term2  N__17 0 Num=2 Z=50 Ohm Noise=yes 
+C:C1  N__16 N__15 C=c1/2 
+
+#load "python","PostProcessing"
+Controller Module="PostProcessing" \ 
+PostProcessingModule="SPOutput" \ 
+Argument[1] = "C:/ffzhzh/SyncFiles/Temp/model_versions/v11_ads_v08_multihead_chain/results/v11_sharedopt_c30_adslen09/ads_cache/LHS150_50_Connection2_test_dut199_TSV" \ 
+Argument[2] = "touchstone" \ 
+Argument[3] = "MA"  
+

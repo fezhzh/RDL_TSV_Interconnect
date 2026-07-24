@@ -1,0 +1,17 @@
+
+hpeesofsim (*) 637.update1.2 Jan 22 2026, MINT version 5
+    (64-bit windows built: Thu Jan 22, 2026 21:43:01 +0000)
+
+***** Simulation started at Fri Jul 10 18:41:13 2026
+      Running on host: "Feng"
+      In Directory: "C:\ffzhzh\SyncFiles\Temp\model_versions\v11_ads_v08_multihead_chain\rdl_ads_sim"
+      Process ID: 46024
+
+Parsing the netlist ...
+
+Error detected by hpeesofsim during netlist parsing.
+    Simulation aborted: Unexpected error occurred: Error reading 'C:\ffzhzh\SyncFiles\Temp\model_versions\v11_ads_v08_multihead_chain\rdl_ads_sim\generated_netlists\LHS400_Connection2_train_dut231_TMRDL.net': Can't open file for reading
+
+Flushing data (please wait) ...
+     ... data flush done.
+

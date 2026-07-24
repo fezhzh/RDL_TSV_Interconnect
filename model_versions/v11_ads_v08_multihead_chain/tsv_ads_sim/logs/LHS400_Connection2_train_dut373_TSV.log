@@ -1,0 +1,59 @@
+
+hpeesofsim (*) 637.update1.2 Jan 22 2026, MINT version 5
+    (64-bit windows built: Thu Jan 22, 2026 21:43:01 +0000)
+
+***** Simulation started at Sat Jul 11 22:17:55 2026
+      Running on host: "Feng"
+      In Directory: "C:\ffzhzh\SyncFiles\Temp\model_versions\v11_ads_v08_multihead_chain\tsv_ads_sim"
+      Process ID: 41404
+
+Parsing the netlist ...
+Flattening the netlist ...
+Loading Post-Processing Module SPOutput (['C:/ffzhzh/SyncFiles/Temp/model_versions/v11_ads_v08_multihead_chain/results/v11_positive_sharedopt_lhs400_connection2_adslen09/ads_cache/LHS400_Connection2_train_dut373_TSV', 'touchstone', 'MA'] )
+
+SP SP1[1] <LHS400_Connection2_train_dut373_TSV.net>   freq=(100 MHz->100 GHz)
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000010) <= MinLegalValue(0.000010) for 'W' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.093535) < MinRecommendValue(0.200000) OR UserValue > MaxRecommendValue(1.500000) for 'D/H' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.093629) < MinRecommendValue(1.000000) OR UserValue > MaxRecommendValue(2.200000) for 'W/H' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000010) <= MinLegalValue(0.000010) for 'W' in `V2'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.093535) < MinRecommendValue(0.200000) OR UserValue > MaxRecommendValue(1.500000) for 'D/H' in `V2'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.093629) < MinRecommendValue(1.000000) OR UserValue > MaxRecommendValue(2.200000) for 'W/H' in `V2'
+
+
+
+Checking for unresolved variables ...
+Post-Processing Module 'PostProcessingModule'.process
+Flushing data (please wait) ...
+     ... data flush done.
+
+Resource usage:
+  Total stopwatch time     =     0.97 seconds.
+
+
+***** Simulation finished at Sat Jul 11 22:17:56 2026
+
+
+
+STDERR:

@@ -1,0 +1,69 @@
+
+hpeesofsim (*) 637.update1.2 Jan 22 2026, MINT version 5
+    (64-bit windows built: Thu Jan 22, 2026 21:43:01 +0000)
+
+***** Simulation started at Wed Jul  8 11:30:37 2026
+      Running on host: "Feng"
+      In Directory: "C:\ffzhzh\SyncFiles\Temp\model_versions\v10_ads_pi_cascade\tsv_ads_sim"
+      Process ID: 46804
+
+Parsing the netlist ...
+Flattening the netlist ...
+Loading Post-Processing Module SPOutput (['C:/ffzhzh/SyncFiles/Temp/model_versions/v10_ads_pi_cascade/results/ads_single_device_calibration_16dut/ads_cache/tsv/er_si-12p5__cond-5p8e07__tand-0p005__c1_scale-1__pitch_scale-1__h_tsv_scale-1__d_scale-1/LHS200_train_dut180_TSV', 'touchstone', 'MA'] )
+
+SP SP1[1] <LHS200_train_dut180_TSV_TSV.net>   freq=(100 MHz->20 GHz)
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000099) < MinRecommendValue(0.000100) OR UserValue > MaxRecommendValue(0.000635) for 'H' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000004) <= MinLegalValue(0.000004) for 'W' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.040502) < MinRecommendValue(0.200000) OR UserValue > MaxRecommendValue(1.500000) for 'D/H' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.040543) < MinRecommendValue(1.000000) OR UserValue > MaxRecommendValue(2.200000) for 'W/H' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000099) < MinRecommendValue(0.000100) OR UserValue > MaxRecommendValue(0.000635) for 'H' in `V2'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000004) <= MinLegalValue(0.000004) for 'W' in `V2'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.040502) < MinRecommendValue(0.200000) OR UserValue > MaxRecommendValue(1.500000) for 'D/H' in `V2'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.040543) < MinRecommendValue(1.000000) OR UserValue > MaxRecommendValue(2.200000) for 'W/H' in `V2'
+
+
+
+Checking for unresolved variables ...
+Post-Processing Module 'PostProcessingModule'.process
+Flushing data (please wait) ...
+     ... data flush done.
+
+Resource usage:
+  Total stopwatch time     =     0.84 seconds.
+
+
+***** Simulation finished at Wed Jul  8 11:30:38 2026
+
+
+
+STDERR:

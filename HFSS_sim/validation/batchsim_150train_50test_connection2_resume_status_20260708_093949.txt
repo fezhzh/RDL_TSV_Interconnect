@@ -1,0 +1,23 @@
+﻿Resume status for HFSS_sim/batchsim_150train_50test_connection2.py
+Timestamp: 2026-07-08 09:39:49 +08:00
+
+Issue:
+- The first run did not produce all test files because the process pool failed with BrokenProcessPool.
+- The test variation record is complete: 50 rows, dut150 to dut199.
+- Exported result files were incomplete when checked.
+
+Current status:
+- Train S2P count: 149 / 150
+- Missing train DUT: 87
+- Test S2P count: 25 / 50
+- Missing test DUT: 171,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199
+
+Actions taken:
+- Changed NUM_PARALLEL from 5 to 3 to reduce AEDT resource pressure.
+- Cleaned old orphaned AEDT/ansyscl processes from the failed run, keeping the current resume run.
+- Restarted the script; it skips existing .s2p files and continues missing DUTs.
+
+Logs:
+- C:\ffzhzh\SyncFiles\Temp\HFSS_sim\LHS150_50_Connection2\batchsim_run_stdout.log
+- C:\ffzhzh\SyncFiles\Temp\HFSS_sim\LHS150_50_Connection2\batchsim_run_stderr.log
+- C:\ffzhzh\SyncFiles\Temp\HFSS_sim\LHS150_50_Connection2\batchsim_resume_*.log

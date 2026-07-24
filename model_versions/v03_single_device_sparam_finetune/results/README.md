@@ -1,0 +1,7 @@
+# v03 结果路径
+
+- `model_versions/v03_single_device_sparam_finetune/results/single_device_sparam_RDL_Bottom/`
+- `model_versions/v03_single_device_sparam_finetune/results/single_device_sparam_RDL_Bottom_mat4_init_sparam/`
+- `model_versions/v03_single_device_sparam_finetune/results/single_device_sparam_RDL_Bottom_mat4_init_sparam_noanchor/`
+- `model_versions/v03_single_device_sparam_finetune/results/single_device_sparam_RDL_Top_mat4_init_sparam_noanchor/`
+- `model_versions/v03_single_device_sparam_finetune/results/single_device_sparam_TSV_mat4_init_sparam_noanchor/`

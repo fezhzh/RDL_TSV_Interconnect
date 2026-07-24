@@ -1,0 +1,23 @@
+{
+  "device_name": "TMRDL",
+  "sample_id": "ads_helper_check",
+  "ads_settings": {
+    "substrate_thickness_um": 100.0,
+    "substrate_er": 11.9,
+    "substrate_loss_tangent": 0.005,
+    "metal_thickness_um": 3.0,
+    "metal_conductivity_s_per_m": 58000000.0
+  },
+  "ads_variables_si": {
+    "l_rdl": 9.999999999999999e-05,
+    "w_rdl": 1.9999999999999998e-05,
+    "pitch": 4.4999999999999996e-05,
+    "h_tsv": 7.999999999999999e-05,
+    "er_si": 11.9,
+    "h_rdl": 2e-06,
+    "cond": 58000000.0,
+    "tand": 0.005
+  },
+  "netlist": "C:\\ffzhzh\\SyncFiles\\Temp\\model_versions\\v10_ads_pi_cascade\\rdl_ads_sim\\generated_netlists\\ads_helper_check_TMRDL.net",
+  "touchstone": "model_versions\\v10_ads_pi_cascade\\rdl_ads_sim\\Snp\\ads_helper_check_TMRDL.s2p"
+}

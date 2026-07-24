@@ -1,0 +1,17 @@
+﻿Validation archive for HFSS_sim/batchsim_150train_50test_connection2.py
+Timestamp: 2026-07-07 22:47:24 +08:00
+
+Checks completed:
+- python -m py_compile HFSS_sim\batchsim_150train_50test_connection2.py: passed
+- conda env list: PyAnsys exists at C:\Users\ffzhz\anaconda3\envs\PyAnsys
+- AEDT project exists: C:\ffzhzh\LocalFiles\Ansys_Project_Files\TSV_RDL_Connection2.aedt
+- Design exists: TSV_RDL
+- HFSS variable check: h_tsv, r_tsv, pitch, l_tmrdl, w_tmrdl, h_tmrdl, l_bsmrdl, w_bsmrdl, h_bsmrdl all present
+- Record-to-HFSS thickness mapping: t_tmrdl -> h_tmrdl; t_bsmrdl -> h_bsmrdl
+- LHS records generated and checked:
+  - train: 150 rows, dut0 to dut149
+  - test: 50 rows, dut150 to dut199
+- Range and pitch validity checks: passed for all generated rows
+
+Output root:
+- HFSS_sim\LHS150_50_Connection2\

@@ -1,0 +1,69 @@
+
+hpeesofsim (*) 637.update1.2 Jan 22 2026, MINT version 5
+    (64-bit windows built: Thu Jan 22, 2026 21:43:01 +0000)
+
+***** Simulation started at Thu Jul  9 23:02:39 2026
+      Running on host: "Feng"
+      In Directory: "C:\ffzhzh\SyncFiles\Temp\model_versions\v11_ads_v08_multihead_chain\tsv_ads_sim"
+      Process ID: 13920
+
+Parsing the netlist ...
+Flattening the netlist ...
+Loading Post-Processing Module SPOutput (['C:/ffzhzh/SyncFiles/Temp/model_versions/v11_ads_v08_multihead_chain/results/ads_vs_hfss_lhs400_connection2_single_device_50/ads_single_device_cache/TSV/LHS400_Connection2_TSV_dut27', 'touchstone', 'MA'] )
+
+SP SP1[1] <LHS400_Connection2_TSV_dut27_TSV.net>   freq=(100 MHz->100 GHz)
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000077) < MinRecommendValue(0.000100) OR UserValue > MaxRecommendValue(0.000635) for 'H' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000011) <= MinLegalValue(0.000011) for 'W' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.145480) < MinRecommendValue(0.200000) OR UserValue > MaxRecommendValue(1.500000) for 'D/H' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.145625) < MinRecommendValue(1.000000) OR UserValue > MaxRecommendValue(2.200000) for 'W/H' in `V3'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000077) < MinRecommendValue(0.000100) OR UserValue > MaxRecommendValue(0.000635) for 'H' in `V2'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.000011) <= MinLegalValue(0.000011) for 'W' in `V2'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.145480) < MinRecommendValue(0.200000) OR UserValue > MaxRecommendValue(1.500000) for 'D/H' in `V2'
+
+
+
+Warning detected by hpeesofsim during SP analysis 'SP1'.
+    UserValue(0.145625) < MinRecommendValue(1.000000) OR UserValue > MaxRecommendValue(2.200000) for 'W/H' in `V2'
+
+
+
+Checking for unresolved variables ...
+Post-Processing Module 'PostProcessingModule'.process
+Flushing data (please wait) ...
+     ... data flush done.
+
+Resource usage:
+  Total stopwatch time     =     0.75 seconds.
+
+
+***** Simulation finished at Thu Jul  9 23:02:40 2026
+
+
+
+STDERR:

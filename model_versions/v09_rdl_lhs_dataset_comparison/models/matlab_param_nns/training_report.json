@@ -1,0 +1,16 @@
+{
+  "workflow": "python_fallback_for_nn_train_3_matlab_style_param_nns",
+  "reason": "MATLAB CLI crashed before executing nn_train_3.m on this machine",
+  "datasets": [
+    "lhs100",
+    "lhs200",
+    "lhs400",
+    "lhs800",
+    "lhs100_lhs200_lhs400_lhs800"
+  ],
+  "devices": [
+    "TMRDL",
+    "BSMRDL"
+  ],
+  "summary_file": "C:\\ffzhzh\\SyncFiles\\Temp\\model_versions\\v09_rdl_lhs_dataset_comparison\\models\\matlab_param_nns\\matlab_training_summary.csv"
+}

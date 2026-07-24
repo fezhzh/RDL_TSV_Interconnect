@@ -1,0 +1,29 @@
+
+hpeesofsim (*) 637.update1.2 Jan 22 2026, MINT version 5
+    (64-bit windows built: Thu Jan 22, 2026 21:43:01 +0000)
+
+***** Simulation started at Wed Jul  8 13:57:20 2026
+      Running on host: "Feng"
+      In Directory: "C:\ffzhzh\SyncFiles\Temp\model_versions\v10_ads_pi_cascade\rdl_ads_sim"
+      Process ID: 9964
+
+Parsing the netlist ...
+Flattening the netlist ...
+Loading Post-Processing Module SPOutput (['C:/ffzhzh/SyncFiles/Temp/model_versions/v10_ads_pi_cascade/results/ads_pi_cascade_lhs200_random100train_100test_calibrated16dut/ads_single_device_cache/LHS200_train_dut181_TMRDL', 'touchstone', 'MA'] )
+
+SP SP1[1] <LHS200_train_dut181_TMRDL.net>   freq=(100 MHz->20 GHz)
+
+Checking for unresolved variables ...
+Post-Processing Module 'PostProcessingModule'.process
+Flushing data (please wait) ...
+     ... data flush done.
+
+Resource usage:
+  Total stopwatch time     =     0.83 seconds.
+
+
+***** Simulation finished at Wed Jul  8 13:57:20 2026
+
+
+
+STDERR:
